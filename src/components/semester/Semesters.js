@@ -2,12 +2,12 @@ import SemesterContext from "../../context/semester/SemesterContext";
 import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SubjectContext from "../../context/subject/SubjectContext";
-import SubjectTable from "../semester/SubjectTable"
-
+import SubjectTable from "../semester/SubjectTable";
+import { useNavigate } from "react-router-dom";
 
 export const Semester = () => {
   const context = useContext(SemesterContext);
-  const { semesters, getSemesters } = context;
+  const { semesters,active, getSemesters, setActiveSemester } = context;
 
   const subjectContext = useContext(SubjectContext);
   const { subjects, getSubjects } = subjectContext;
@@ -16,25 +16,45 @@ export const Semester = () => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [yesAdded, setYesAdded] = useState(false);
+  const refresh = () => window.location.reload(true)
 
   useEffect(() => {
-    const fetchSemesters = async () => {
+    const fetchData = async () => {
       await getSemesters();
-      if (semesters.length > 0 && !yesAdded) {
-        setSemester(semesters[semesters.length - 1]);
-        setYesAdded(true);
-      }
     };
-    fetchSemesters();
-    const fetchSubjects = async () => {
-      await getSubjects(semester._id);
-    };
-    fetchSubjects();
-  }, [getSemesters, semesters, yesAdded]);
 
-  const onClick = (semester) => {
+    fetchData();
+  }, [getSemesters]);
+
+  useEffect(() => {
+    if (semesters.length > 0 && !yesAdded) {
+      for (let index = 0; index < semesters.length; index++) {
+        const element = semesters[index];
+        if(element.active){
+          setSemester(element);
+        getSubjects(element._id);
+        setYesAdded(true);
+        break
+        }
+      }
+    }
+  }, [semesters, active, yesAdded, getSubjects,getSemesters]);
+
+const onClick = (semester) => {
     setSemester(semester);
-    setDropdownOpen(false); // Close the dropdown when a semester is selected
+    setDropdownOpen(false);
+    getSubjects(semester._id);
+  };
+
+  const activeBtnClicked = async () => {
+    await setActiveSemester(semester._id);
+    await getSemesters();
+    const updatedActive = semesters.find(sem => sem._id === semester._id);
+    if (updatedActive) {
+      setSemester(updatedActive);
+      getSubjects(updatedActive._id);
+    }
+    refresh();
   };
 
   return (
@@ -48,29 +68,41 @@ export const Semester = () => {
             {semester.name}
           </h1>
           <div className="relative">
-            <button
-              id="dropdownDefaultButton"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              type="button"
-            >
-              Semesters
-              <svg
-                className="w-2.5 h-2.5 ml-2.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
+            <div>
+              {!semester.active&&
+                <button
+                type="button"
+                className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                onClick={activeBtnClicked}
               >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 1 4 4 4-4"
-                />
-              </svg>
-            </button>
+                Set semester as active
+              </button>}
+              
+
+              <button
+                id="dropdownDefaultButton"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                type="button"
+              >
+                Semesters
+                <svg
+                  className="w-2.5 h-2.5 ml-2.5"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+            </div>
             {dropdownOpen && (
               <div
                 id="dropdown"
@@ -104,8 +136,8 @@ export const Semester = () => {
             )}
           </div>
         </div>
-        <div style={{marginTop:30}}>
-        <SubjectTable subjects={subjects}/>
+        <div style={{ marginTop: 30 }}>
+          <SubjectTable subjects={subjects} />
         </div>
       </div>
     </>

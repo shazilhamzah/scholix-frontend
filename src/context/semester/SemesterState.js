@@ -7,6 +7,7 @@ const authToken =
 
 const SemesterState = (props) => {
   const [semesters, setSemesters] = useState([]);
+  const [active,setActive] = useState([]);
 
   // FETCH NOTES
   const getSemesters = async () => {
@@ -64,8 +65,21 @@ const SemesterState = (props) => {
       console.log(a)  
   };
 
+  const setActiveSemester = async (semesterId) => {
+    const response = await fetch(`${host}/api/semester/toggleactive/${semesterId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token": authToken,
+      },
+      body: JSON.stringify({ semesterId }),
+    });
+    const data = await response.json();
+    setActive(data);
+  };
+
   return (
-    <SemesterContext.Provider value={{ semesters, getSemesters, addSemester,addSGPA }}>
+    <SemesterContext.Provider value={{ semesters,active, getSemesters, addSemester,addSGPA,setActiveSemester }}>
       {props.children}
     </SemesterContext.Provider>
   );
