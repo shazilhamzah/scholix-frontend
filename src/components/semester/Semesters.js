@@ -3,7 +3,6 @@ import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SubjectContext from "../../context/subject/SubjectContext";
 import SubjectTable from "../semester/SubjectTable";
-import { useNavigate } from "react-router-dom";
 
 export const Semester = () => {
   const context = useContext(SemesterContext);
@@ -32,8 +31,8 @@ export const Semester = () => {
         const element = semesters[index];
         if(element.active){
           setSemester(element);
-        getSubjects(element._id);
-        setYesAdded(true);
+          getSubjects(element._id);
+          setYesAdded(true);
         break
         }
       }
@@ -54,6 +53,7 @@ const onClick = (semester) => {
       setSemester(updatedActive);
       getSubjects(updatedActive._id);
     }
+    console.log(active);
     refresh();
   };
 

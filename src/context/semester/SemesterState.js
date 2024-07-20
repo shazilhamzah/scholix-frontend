@@ -1,5 +1,6 @@
 import { useState } from "react";
 import SemesterContext from "./SemesterContext";
+import { useEffect } from "react";
 
 const host = "http://localhost:5000";
 const authToken =
@@ -7,7 +8,14 @@ const authToken =
 
 const SemesterState = (props) => {
   const [semesters, setSemesters] = useState([]);
-  const [active,setActive] = useState([]);
+  const [active,setActive] = useState({});
+
+  useEffect(() => {
+    const activeSemester = localStorage.getItem('activeSemester');
+    if (activeSemester) {
+      setActive(JSON.parse(activeSemester));
+    }
+  }, []);
 
   // FETCH NOTES
   const getSemesters = async () => {
@@ -76,6 +84,8 @@ const SemesterState = (props) => {
     });
     const data = await response.json();
     setActive(data);
+    localStorage.setItem('activeSemester', JSON.stringify(data));
+    console.log(active)
   };
 
   return (
