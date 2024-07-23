@@ -22,9 +22,25 @@ const SubjectState = (props) =>{
         setSubjects(a);
     };
 
+    const addSubject = async(semesterID,name,creditHrs,subjectType,grading,grade,teacherName)=>{
+        console.log("Teacher name input 2: ",teacherName);
+        const response = await fetch(`${host}/api/subject/newsubject`,{
+            method:'POST',
+            headers:{
+                "Content-Type": "application/json",
+                "auth-token":authToken,
+                "semesterID":semesterID
+            },
+            body: JSON.stringify({ name,creditHrs,subjectType,grading,grade,teacherName }),
+        });
+        const a = await response.json();
+        setSubjects([...subjects,a]);
+        console.log(a);
+    }
+
 
     return (
-        <SubjectContext.Provider value={{ subjects,getSubjects }}>
+        <SubjectContext.Provider value={{ subjects,getSubjects,addSubject }}>
           {props.children}
         </SubjectContext.Provider>
       );
