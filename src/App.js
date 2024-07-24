@@ -6,7 +6,9 @@ import SemesterState from "./context/semester/SemesterState";
 
 import SubjectState from "./context/subject/SubjectState";
 import Subjects from "./components/subjects/Subjects";
+import ExamState from "./context/exam/ExamState";
 import { AddSubject } from "./components/subjects/AddSubject";
+import { AddExam } from "./components/subjects/AddExam";
 
 import { Sidebar } from "./components/Sidebar";
 
@@ -19,12 +21,15 @@ function App() {
         <div className="container">
             <SemesterState>
             <SubjectState>
+              <ExamState>
               <Routes>
               <Route path="/semesters" element={<Semester />} />
               <Route path="/addsemester" element={<AddSemester/>}/>
               <Route path="/subjects" element={<Subjects/>}/>
               <Route path="/addsubject" element={<AddSubject/>}/>
+              <Route path="/addexam" element={<AddExam/>}/>
               </Routes>
+              </ExamState>
               </SubjectState>
             </SemesterState>
         </div>

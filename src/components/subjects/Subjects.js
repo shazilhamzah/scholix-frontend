@@ -1,17 +1,30 @@
-import SemesterContext from "../../context/semester/SemesterContext";
 import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import SemesterContext from "../../context/semester/SemesterContext";
 import SubjectContext from "../../context/subject/SubjectContext";
+import ExamContext from "../../context/exam/ExamContext";
+import ExamTable from "./ExamTable";
+import { Semester } from "../semester/Semesters";
 
 const Subjects = () => {
+  // CONTEXTS
   const semesterContext = useContext(SemesterContext);
   const { active } = semesterContext;
 
   const subjectContext = useContext(SubjectContext);
   const { subjects, getSubjects } = subjectContext;
 
+  const examContext = useContext(ExamContext);
+  const { exams, getExams } = examContext;
+
+  // STATES
+
   const [subject, setSubject] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  // const [allExams, setAllExams] = useState({});
+  const [assignments, setAssignments] = useState([]);
+
+  // EFFECTS
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,18 +36,45 @@ const Subjects = () => {
   }, [active, getSubjects]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      if (active && active._id && subject._id) {
+        await getExams(active._id, subject._id);
+      }
+    };
+    fetchData();
+  }, [active, subject, getExams]);
+
+  useEffect(() => {
+    if (exams) {
+      const assignmentExams = exams.filter(
+        (exam) => exam.examType === "assignment"
+      );
+      setAssignments(assignmentExams);
+    }
+  }, [exams]);
+
+  useEffect(() => {
     if (subjects.length > 0 && !subject._id) {
       setSubject(subjects[0]);
     }
+
   }, [subjects, subject]);
 
+  // BUTTON FUNCTIONS
+
+  const refresh = () => window.location.reload(true)
   const onClick = (subject) => {
     setSubject(subject);
     setDropdownOpen(false);
   };
 
+  const addExamButton = (examType) => {
+    // console.log(assignments);
+  };
+
   return (
     <>
+      {/* TOP HEADING + DROPDOWN FOR SUBJECTS */}
       <div className="p-4 sm:ml-64">
         <div
           className="upper-row flex justify-between items-center"
@@ -102,9 +142,28 @@ const Subjects = () => {
             )}
           </div>
         </div>
-        <div style={{ marginTop: 30 }}>
-          {/* <SubjectTable subjects={subjects} /> */}
-        </div>
+
+        {/* ASSIGNMENTS - HEADING */}
+
+        <div className="flex my-3 flex-row items-center gap-3">
+          <h1 className="text-4xl font-extrabold dark:text-white">
+            <small className="ml-1 font-semibold text-gray-500 dark:text-gray-400">
+              Assignments
+            </small>
+          </h1>
+          <button
+            style={{ height: "30px", width: "30px", marginTop: 10 }}
+            type="button"
+            className="text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+            onClick={() => addExamButton("assignment")}
+          >
+            +
+          </button>
+          </div>
+
+            {/* ASSIGNMENTS - TABLE */}
+            <ExamTable key={subject._id} assignments={assignments}/>
+
       </div>
     </>
   );

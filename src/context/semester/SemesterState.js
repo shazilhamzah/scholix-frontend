@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import SemesterContext from "./SemesterContext";
-import { useEffect } from "react";
 
 const host = "http://localhost:5000";
 const authToken =
