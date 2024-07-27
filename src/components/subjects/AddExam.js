@@ -60,17 +60,19 @@ export const AddExam = () => {
   const navigate = useNavigate();
   const { type } = useParams();
   const onClick = async (event) => {
-    console.log(active._id);
-    console.log(id.id);
-    const a = await addExam(
-      active._id,
-      id.id,
-      type,
-      totalMarksInput,
-      obtainedMarksInput,
-      averageMarksInput,
-      weightageInput
-    );
+    try {
+      const a = await addExam(
+        active._id,
+        id.id,
+        type,
+        totalMarksInput,
+        obtainedMarksInput,
+        averageMarksInput,
+        weightageInput
+      );
+    } catch (error) {
+      console.error("Error adding exam",error);
+    }
   };
 
   return (
