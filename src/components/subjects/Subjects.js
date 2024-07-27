@@ -4,7 +4,7 @@ import SemesterContext from "../../context/semester/SemesterContext";
 import SubjectContext from "../../context/subject/SubjectContext";
 import ExamContext from "../../context/exam/ExamContext";
 import ExamTable from "./ExamTable";
-import { Semester } from "../semester/Semesters";
+import "flowbite";
 
 const Subjects = () => {
   // CONTEXTS
@@ -18,14 +18,17 @@ const Subjects = () => {
   const { exams, getExams } = examContext;
 
   // STATES
-
   const [subject, setSubject] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  // const [allExams, setAllExams] = useState({});
   const [assignments, setAssignments] = useState([]);
+  const [quiz, setQuiz] = useState([]);
+  const [homework, setHomework] = useState([]);
+  const [project, setProject] = useState([]);
+  const [midterm, setMidterm] = useState([]);
+  const [final, setFinal] = useState([]);
+  const [openSections, setOpenSections] = useState({});
 
   // EFFECTS
-
   useEffect(() => {
     const fetchData = async () => {
       if (active && active._id) {
@@ -50,6 +53,21 @@ const Subjects = () => {
         (exam) => exam.examType === "assignment"
       );
       setAssignments(assignmentExams);
+
+      const quizExams = exams.filter((exam) => exam.examType === "quiz");
+      setQuiz(quizExams);
+
+      const homeworkExam = exams.filter((exam) => exam.examType === "homework");
+      setHomework(homeworkExam);
+
+      const projectExam = exams.filter((exam) => exam.examType === "project");
+      setProject(projectExam);
+
+      const midExam = exams.filter((exam) => exam.examType === "midterm");
+      setMidterm(midExam);
+
+      const finalExam = exams.filter((exam) => exam.examType === "final");
+      setFinal(finalExam);
     }
   }, [exams]);
 
@@ -57,32 +75,46 @@ const Subjects = () => {
     if (subjects.length > 0 && !subject._id) {
       setSubject(subjects[0]);
     }
-
   }, [subjects, subject]);
 
   // BUTTON FUNCTIONS
-
-  const refresh = () => window.location.reload(true)
+  const refresh = () => window.location.reload(true);
   const onClick = (subject) => {
     setSubject(subject);
     setDropdownOpen(false);
+    setAssignments([]);
+    setQuiz([]);
+    setHomework([]);
+    setProject([]);
+    setMidterm([]);
+    setFinal([]);
   };
 
-  const addExamButton = (examType) => {
-    // console.log(assignments);
+  const toggleSection = (index) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
   };
 
   return (
     <>
       {/* TOP HEADING + DROPDOWN FOR SUBJECTS */}
+
       <div className="p-4 sm:ml-64">
         <div
           className="upper-row flex justify-between items-center"
           style={{ marginBottom: 10 }}
         >
-          <h1 className="text-5xl font-extrabold dark:text-white">
-            {subject.name}
-          </h1>
+          {!subjects.length == 0 ? (
+            <h1 className="text-5xl font-extrabold dark:text-white">
+              {subject.name}
+            </h1>
+          ) : (
+            <h1 className="text-5xl font-extrabold dark:text-white">
+              No subjects found.
+            </h1>
+          )}
           <div className="relative">
             <div>
               <button
@@ -143,27 +175,85 @@ const Subjects = () => {
           </div>
         </div>
 
-        {/* ASSIGNMENTS - HEADING */}
-
-        <div className="flex my-3 flex-row items-center gap-3">
-          <h1 className="text-4xl font-extrabold dark:text-white">
-            <small className="ml-1 font-semibold text-gray-500 dark:text-gray-400">
-              Assignments
-            </small>
-          </h1>
-          <button
-            style={{ height: "30px", width: "30px", marginTop: 10 }}
-            type="button"
-            className="text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-            onClick={() => addExamButton("assignment")}
+        {/* ACCORDION */}
+        {!subjects.length == 0 ? (
+          <div
+            className="my-5"
+            id="accordion-collapse"
+            data-accordion="collapse"
           >
-            +
-          </button>
+            {[
+              { type: "assignment", label: "Assignments", exams: assignments },
+              { type: "quiz", label: "Quiz", exams: quiz },
+              { type: "homework", label: "Homework", exams: homework },
+              { type: "project", label: "Project", exams: project },
+              { type: "midterm", label: "Midterm", exams: midterm },
+              { type: "final", label: "Final", exams: final },
+            ].map((section, index) => (
+              <div key={section.type}>
+                <h2 id={`accordion-collapse-heading-${index}`}>
+                  <button
+                    type="button"
+                    className="flex items-center justify-between w-full p-4 font-medium text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3"
+                    onClick={() => toggleSection(index)}
+                  >
+                    <span>{section.label}</span>
+                    <svg
+                      className={`w-3 h-3 transition-transform ${
+                        openSections[index] ? "rotate-180" : ""
+                      }`}
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 10 6"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 5 5 1 1 5"
+                      />
+                    </svg>
+                  </button>
+                </h2>
+                <div
+                  id={`accordion-collapse-body-${index}`}
+                  className={openSections[index] ? "" : "hidden"}
+                  aria-labelledby={`accordion-collapse-heading-${index}`}
+                >
+                  <div className="p-3 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+                    <ExamTable
+                      key={`${section.type}-${subject._id}`}
+                      subject={section.exams}
+                    />
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <Link
+                        to={`/addexam/${section.type}`}
+                        state={{ id: subject._id }}
+                      >
+                        <button
+                          style={{
+                            height: "30px",
+                            width: "30px",
+                            marginTop: 15,
+                            marginBottom: 10,
+                          }}
+                          type="button"
+                          className="text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                        >
+                          +
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-
-            {/* ASSIGNMENTS - TABLE */}
-            <ExamTable key={subject._id} assignments={assignments}/>
-
+        ) : (
+          <p></p>
+        )}
       </div>
     </>
   );

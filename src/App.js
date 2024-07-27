@@ -27,7 +27,7 @@ function App() {
               <Route path="/addsemester" element={<AddSemester/>}/>
               <Route path="/subjects" element={<Subjects/>}/>
               <Route path="/addsubject" element={<AddSubject/>}/>
-              <Route path="/addexam" element={<AddExam/>}/>
+              <Route path="/addexam/:type" element={<AddExam/>}/>
               </Routes>
               </ExamState>
               </SubjectState>

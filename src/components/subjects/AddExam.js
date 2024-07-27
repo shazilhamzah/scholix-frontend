@@ -1,132 +1,104 @@
-import { useContext, useState } from "react";
-import { Link } from "react-router-dom";
-import React from "react";
+import { useState, useContext, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import SemesterContext from "../../context/semester/SemesterContext";
-import SubjectContext from "../../context/subject/SubjectContext";
+import ExamContext from "../../context/exam/ExamContext";
 
 export const AddExam = () => {
-  const context = useContext(SubjectContext);
-  const {addSubject} = context;
-  const semcontext = useContext(SemesterContext);
-  const {active} = semcontext;
-
-  const [subjectInput, setsubjectInput] = useState("");
-  const [creditHrsInput, setcreditHrsInput] = useState("");
-  const [subejctTypeInput, setSubejctTypeInput] = useState("");
-  const [gradingTypeInput, setGradingTypeInput] = useState("Select Grading Type");
-  const [gradeInput, setGradeInput] = useState("");
-  const [teacherNameInput, setteacherNameInput] = useState("");
+  // STATES
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [examTypeInput, setExamTypeInput] = useState("Select Exam Type");
+  const [totalMarksInput, setTotalMarksInput] = useState();
+  const [obtainedMarksInput, setObtainedMarksInput] = useState();
+  const [averageMarksInput, setAverageMarksInput] = useState();
+  const [weightageInput, setWeightageInput] = useState();
 
-  const onClick = async () => {
-    console.log("Teacher Name Input:", teacherNameInput);
-    const a = await addSubject(active._id, subjectInput,creditHrsInput,subejctTypeInput,gradingTypeInput,gradeInput,teacherNameInput);
-  };  
+  // CONTEXTS
+  const semcontext = useContext(SemesterContext);
+  const { active } = semcontext;
+  const { addExam } = useContext(ExamContext);
 
-  const onChangeSubject = (event) => {
-    setsubjectInput(event.target.value);
-  };
+  // Retrieve the subjectID from state
+  const location = useLocation();
+  const id = location.state;
 
-  const onChangeCH = (event) => {
-    setcreditHrsInput(event.target.value);
-  };
-
-  const onChangeSubejctType = (event) => {
-    setSubejctTypeInput(event.target.value);
-  };
-
-  const onChangeGrade = (event) => {
-    setGradeInput(event.target.value);
-  };
-  
-  const onChangeTeacher = (event) => {
-    setteacherNameInput(event.target.value);
-  };
-
+  // FUNCTIONS
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
-  const gradingTypeInputFunction = (s) => () => {
-    if (s === "Relative" || s === "Absolute") {
-      setGradingTypeInput(s);
+  const examTypeInputFunction = (s) => () => {
+    if (
+      s === "Assignment" ||
+      s === "Final" ||
+      s === "Project" ||
+      s === "Quiz" ||
+      s === "MidTerm" ||
+      s === "Homework"
+    ) {
+      setExamTypeInput(s);
       setDropdownOpen(false);
     }
+  };
+
+  const onChangeTotalMarks = (event) => {
+    setTotalMarksInput(event.target.value);
+  };
+
+  const onChangeObtainedMarks = (event) => {
+    setObtainedMarksInput(event.target.value);
+  };
+
+  const onChangeAverageMarks = (event) => {
+    setAverageMarksInput(event.target.value);
+  };
+
+  const onChangeWeightage = (event) => {
+    setWeightageInput(event.target.value);
+  };
+
+  const navigate = useNavigate();
+  const { type } = useParams();
+  const onClick = async (event) => {
+    console.log(active._id);
+    console.log(id.id);
+    const a = await addExam(
+      active._id,
+      id.id,
+      type,
+      totalMarksInput,
+      obtainedMarksInput,
+      averageMarksInput,
+      weightageInput
+    );
   };
 
   return (
     <>
       <div className="p-4 sm:ml-64">
+        {/* HEADING - START */}
+
         <h1
           className="text-5xl font-extrabold dark:text-white"
           style={{ marginBottom: 20 }}
         >
-          Add Subject
+          Add Exam
         </h1>
+
         <form className="mx-auto max-w-sm align-center mt-5">
-          <div className="mb-3">
-            <div className="flex gap-2">
-            <label
-              htmlFor="subject"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Subject name
-            </label>
-            <span className="block text-sm font-medium text-red-700 dark:text-white italic">*Required</span>
-            </div>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              required
-              value={subjectInput}
-              onChange={onChangeSubject}
-            />
-          </div>
+          {/* EXAM TYPE - START
+
           <div className="mb-4">
             <div className="flex gap-2">
-            <label
-              htmlFor="credithrs"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Credit Hrs.{" "}
-            </label>
-            <span className="block text-sm font-medium text-red-700 dark:text-white italic">*Required</span>
-            </div>
-            <input
-              type="number"
-              id="credithrs"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              value={creditHrsInput}
-              onChange={onChangeCH}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              htmlFor="subjectType"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Subject Type{" "}
-            </label>
-            <input
-              type="text"
-              id="subjectType"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              value={subejctTypeInput}
-              onChange={onChangeSubejctType}
-            />
-          </div>
-          <div className="mb-4">
-            <div className="flex gap-2">
-            <label
-              htmlFor="grading"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Grading Type
-            </label>
-            <span className="block text-sm font-medium text-red-700 dark:text-white italic">*Required</span>
+              <label
+                htmlFor="examType"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Exam Type
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
             </div>
             <button
               id="dropdownDefaultButton"
@@ -135,11 +107,11 @@ export const AddExam = () => {
               type="button"
               onClick={toggleDropdown}
             >
-              {gradingTypeInput}
+              {examTypeInput}
             </button>
             {dropdownOpen && (
               <div
-                id="dropdown"
+                id="data-dropdown-toggle"
                 className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
               >
                 <ul
@@ -150,54 +122,158 @@ export const AddExam = () => {
                     <button
                       type="button"
                       className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={gradingTypeInputFunction("Relative")}
+                      onClick={examTypeInputFunction("Quiz")}
                     >
-                      Relative
+                      Quiz
                     </button>
                   </li>
                   <li>
                     <button
                       type="button"
                       className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={gradingTypeInputFunction("Absolute")}
+                      onClick={examTypeInputFunction("MidTerm")}
                     >
-                      Absolute
+                      MidTerm
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={examTypeInputFunction("Assignment")}
+                    >
+                      Assignment
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={examTypeInputFunction("Project")}
+                    >
+                      Project
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={examTypeInputFunction("Homework")}
+                    >
+                      Homework
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      onClick={examTypeInputFunction("Final")}
+                    >
+                      Final
                     </button>
                   </li>
                 </ul>
               </div>
             )}
-          </div>
+          </div> */}
+
+          {/* TOTAL MARKS - START */}
+
           <div className="mb-4">
-            <label
-              htmlFor="grade"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Grade
-            </label>
+            <div className="flex gap-2">
+              <label
+                htmlFor="totalMarks"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Total Marks{" "}
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
+            </div>
             <input
-              type="text"
-              id="grade"
+              type="number"
+              id="totalMarks"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              value={gradeInput}
-              onChange={onChangeGrade}
+              value={totalMarksInput}
+              onChange={onChangeTotalMarks}
+              required
             />
           </div>
+
+          {/* OBTAINED MARKS - START */}
+
           <div className="mb-4">
-            <label
-              htmlFor="teacher"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Teacher Name
-            </label>
+            <div className="flex gap-2">
+              <label
+                htmlFor="obtainedMarks"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Obtained Marks{" "}
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
+            </div>
             <input
-              type="text"
-              id="teacher"
+              type="number"
+              id="obtainedMarks"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              value={teacherNameInput}
-              onChange={onChangeTeacher}
+              value={obtainedMarksInput}
+              onChange={onChangeObtainedMarks}
+              required
             />
           </div>
+
+          {/* AVERAGE MARKS - START */}
+
+          <div className="mb-4">
+            <div className="flex gap-2">
+              <label
+                htmlFor="averageMarks"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Average Marks{" "}
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
+            </div>
+            <input
+              type="number"
+              id="averageMarks"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              value={averageMarksInput}
+              onChange={onChangeAverageMarks}
+              required
+            />
+          </div>
+
+          {/* WEIGHTAGE - START */}
+
+          <div className="mb-4">
+            <div className="flex gap-2">
+              <label
+                htmlFor="averageMarks"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Weightage{" "}
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
+            </div>
+            <input
+              type="number"
+              id="weightage"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              value={weightageInput}
+              onChange={onChangeWeightage}
+              required
+            />
+          </div>
+
+          {/* ADD BUTTON - START */}
           <Link
             to="/subjects"
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -207,6 +283,8 @@ export const AddExam = () => {
           </Link>
         </form>
       </div>
+
+      {/* <button onClick={SubjectDetail}>kjascb</button> */}
     </>
   );
 };

@@ -25,11 +25,32 @@ const ExamState = (props) => {
     }
   catch (error) {
     console.error("Error fetching exams:", error);
-  }}
+  }};
+
+  // ADD EXAM
+  const addExam = async(semesterID,subjectID,examType,totalMarks,obtainedMarks,averageMarks,weightage) =>{
+    try {
+      const response = await fetch(`${host}/api/exam/newexam`,{
+        method:'POST',
+        headers:{
+          "Content-Type": "application/json",
+          "auth-token": authToken,
+          "semesterID": semesterID,
+          "subjectID": subjectID,
+        },
+        body: JSON.stringify({ examType,totalMarks,obtainedMarks,averageMarks,weightage }),
+      })
+      const a = await response.json()
+      setExams([...exams,a]);
+      console.log(a);
+    } catch (error) {
+      console.error("Error adding exams:", error);
+    }
+  }
   
 
   return (
-    <ExamContext.Provider value={{ exams, getExams }}>
+    <ExamContext.Provider value={{ exams, getExams,addExam }}>
       {props.children}
     </ExamContext.Provider>
   );

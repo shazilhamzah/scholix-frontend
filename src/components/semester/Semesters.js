@@ -6,7 +6,7 @@ import SubjectTable from "../semester/SubjectTable";
 
 export const Semester = () => {
   const context = useContext(SemesterContext);
-  const { semesters,active, getSemesters, setActiveSemester } = context;
+  const { semesters, active, getSemesters, setActiveSemester } = context;
 
   const subjectContext = useContext(SubjectContext);
   const { subjects, getSubjects } = subjectContext;
@@ -15,7 +15,7 @@ export const Semester = () => {
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [yesAdded, setYesAdded] = useState(false);
-  const refresh = () => window.location.reload(true)
+  const refresh = () => window.location.reload(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,17 +29,20 @@ export const Semester = () => {
     if (semesters.length > 0 && !yesAdded) {
       for (let index = 0; index < semesters.length; index++) {
         const element = semesters[index];
-        if(element.active){
+        if (element.active) {
           setSemester(element);
           getSubjects(element._id);
           setYesAdded(true);
-        break
+          break;
         }
       }
+      if (!yesAdded) {
+        setSemester(semesters[0]);
+      }
     }
-  }, [semesters, active, yesAdded, getSubjects,getSemesters]);
+  }, [semesters, active, yesAdded, getSubjects, getSemesters]);
 
-const onClick = (semester) => {
+  const onClick = (semester) => {
     setSemester(semester);
     setDropdownOpen(false);
     getSubjects(semester._id);
@@ -48,7 +51,7 @@ const onClick = (semester) => {
   const activeBtnClicked = async () => {
     await setActiveSemester(semester._id);
     await getSemesters();
-    const updatedActive = semesters.find(sem => sem._id === semester._id);
+    const updatedActive = semesters.find((sem) => sem._id === semester._id);
     if (updatedActive) {
       setSemester(updatedActive);
       getSubjects(updatedActive._id);
@@ -64,20 +67,26 @@ const onClick = (semester) => {
           className="upper-row flex justify-between items-center"
           style={{ marginBottom: 10 }}
         >
-          <h1 className="text-5xl font-extrabold dark:text-white">
-            {semester.name}
-          </h1>
+          {!semesters.length == 0 ? (
+            <h1 className="text-5xl font-extrabold dark:text-white">
+              {semester.name}
+            </h1>
+          ) : (
+            <h1 className="text-5xl font-extrabold dark:text-white">
+              No semesters found.
+            </h1>
+          )}
           <div className="relative">
             <div>
-              {!semester.active&&
+              {!semester.active && !semesters.length == 0 && (
                 <button
-                type="button"
-                className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                onClick={activeBtnClicked}
-              >
-                Set semester as active
-              </button>}
-              
+                  type="button"
+                  className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                  onClick={activeBtnClicked}
+                >
+                  Set semester as active
+                </button>
+              )}
 
               <button
                 id="dropdownDefaultButton"
@@ -137,7 +146,11 @@ const onClick = (semester) => {
           </div>
         </div>
         <div style={{ marginTop: 30 }}>
-          <SubjectTable subjects={subjects} />
+          {!semesters.length == 0 ? (
+            <SubjectTable subjects={subjects} />
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </>
