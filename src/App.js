@@ -11,10 +11,11 @@ import { Dashboard } from "./components/dashboard/Dashboard";
 import { Sidebar } from "./components/sidebar/Sidebar";
 import { Login } from "./components/auth/Login";
 import { Home } from "./components/home/Home";
+import { Signup } from "./components/auth/Signup";
 
 function Layout({ children }) {
   const location = useLocation();
-  const hideSidebar = location.pathname === "/login" || location.pathname === "/";
+  const hideSidebar = location.pathname === "/login" || location.pathname === "/" || location.pathname === "/signup";
 
   return (
     <>
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/addsubject" element={<AddSubject />} />
                 <Route path="/addexam/:type" element={<AddExam />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
               </Routes>
             </Layout>
           </ExamState>

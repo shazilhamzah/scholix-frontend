@@ -3,9 +3,9 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 const host = "http://localhost:5000";
 
-export const Login = () => {
+export const Signup = () => {
   // STATES
-  const [creds, setCreds] = useState({ email: "", password: "" });
+  const [creds, setCreds] = useState({ name: "", email: "", password: "" });
 
   // FUNCTIONS
   const onChange = (e) => {
@@ -15,24 +15,27 @@ export const Login = () => {
   const history = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch(`${host}/api/auth/login`, {
+    const response = await fetch(`${host}/api/auth/createuser`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email: creds.email, password: creds.password }),
+      body: JSON.stringify({
+        name: creds.name,
+        email: creds.email,
+        password: creds.password,
+      }),
     });
     const json = await response.json();
     if (json.success) {
       localStorage.setItem("token", json.authToken);
       history("/dashboard");
-    } else {
     }
   };
 
   // JSX RETURN
   return (
-    <section class="bg-white dark:bg-gray-900 mx-5 my-5">
+    <section class="bg-white dark:bg-gray-900 mx-5 my-3">
       <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <a
           href="#"
@@ -55,6 +58,24 @@ export const Login = () => {
               action="#"
               onSubmit={handleSubmit}
             >
+              <div>
+                <label
+                  for="email"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Your name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="Alex Brown"
+                  required
+                  value={creds.name}
+                  onChange={onChange}
+                />
+              </div>
               <div>
                 <label
                   for="email"
@@ -91,27 +112,19 @@ export const Login = () => {
                   onChange={onChange}
                 />
               </div>
-              <div class="flex items-center justify-between">
-                <a
-                  href="#"
-                  class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
-                >
-                  Forgot password?
-                </a>
-              </div>
               <button
                 type="submit"
                 class="w-full text-black bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
               >
-                Sign in
+                Register
               </button>
               <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-                Don't have an account yet?{" "}
+                Already have an account yet?{" "}
                 <Link
-                  to="/signup"
+                  to="/login"
                   class="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
-                  Sign up
+                  Login
                 </Link>
               </p>
             </form>
