@@ -60,6 +60,15 @@ export const Sidebar = () => {
         className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } sm:translate-x-0 sm:block bg-gray-50 dark:bg-gray-800`}
+        // style={{
+        //   marginBottom: 20,
+        //   height: "95%",
+        //   marginTop: 18,
+        //   borderTopRightRadius: 15,
+        //   borderBottomRightRadius: 15.63,
+        //   backgroundImage:
+        //     "linear(to top, #925FE2,  #E2D4F7)",
+        // }}
         aria-label="Sidebar"
       >
         <div className="h-full px-3 py-4 overflow-y-auto">

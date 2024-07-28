@@ -10,8 +10,9 @@ import ExamState from "./context/exam/ExamState";
 import { AddSubject } from "./components/subjects/AddSubject";
 import { AddExam } from "./components/subjects/AddExam";
 
-import { Sidebar } from "./components/Sidebar";
 import { Dashboard } from "./components/dashboard/Dashboard";
+import { Sidebar } from "./components/sidebar/Sidebar";
+import { Login } from "./components/auth/Login";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
               <Route path="/subjects" element={<Subjects/>}/>
               <Route path="/addsubject" element={<AddSubject/>}/>
               <Route path="/addexam/:type" element={<AddExam/>}/>
+              <Route path="/login" element={<Login/>}/>
               </Routes>
               </ExamState>
               </SubjectState>

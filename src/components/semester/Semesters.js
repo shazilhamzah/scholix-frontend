@@ -18,6 +18,13 @@ export const Semester = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [yesAdded, setYesAdded] = useState(false);
   const refresh = () => window.location.reload(true);
+  const s = useNavigate();
+
+  useEffect(()=>{
+    if(!localStorage.getItem("token")){
+      s("/login");
+    }
+  })
 
   useEffect(() => {
     const fetchData = async () => {

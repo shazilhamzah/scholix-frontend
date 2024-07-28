@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import SemesterContext from "../../context/semester/SemesterContext";
 import SubjectContext from "../../context/subject/SubjectContext";
 import ExamContext from "../../context/exam/ExamContext";
@@ -29,13 +29,19 @@ const Subjects = () => {
   const [openSections, setOpenSections] = useState({});
 
   // EFFECTS
+  const s = useNavigate();
   useEffect(() => {
-    const fetchData = async () => {
-      if (active && active._id) {
-        await getSubjects(active._id);
-      }
-    };
-    fetchData();
+    if(!localStorage.getItem("token")){
+      s("/login")
+    }
+    else{
+      const fetchData = async () => {
+        if (active && active._id) {
+          await getSubjects(active._id);
+        }
+      };
+      fetchData();
+    }
   }, [active, getSubjects]);
 
   useEffect(() => {
