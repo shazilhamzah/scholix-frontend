@@ -5,8 +5,6 @@ import SemesterContext from "../semester/SemesterContext";
 import Swal from "sweetalert2";
 
 const host = "http://localhost:5000";
-const authToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY5NjQ5OWExNDNhZWRmNWIxNWQzNGZjIn0sImlhdCI6MTcyMTEyNTMxNH0.hvbRFYZo-DrqCidjhMSBFR42QkLoWz4NGWD9NzaPUKc";
 
 const ExamState = (props) => {
 
@@ -141,7 +139,7 @@ const ExamState = (props) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": authToken,
+          "auth-token": localStorage.getItem("token"),
           "semesterID": semesterID,
           "subjectID": subjectID,
         },
@@ -160,7 +158,7 @@ const ExamState = (props) => {
         method:'POST',
         headers:{
           "Content-Type": "application/json",
-          "auth-token": authToken,
+          "auth-token": localStorage.getItem("token"),
           "semesterID": semesterID,
           "subjectID": subjectID,
         },
@@ -184,7 +182,7 @@ const ExamState = (props) => {
         method:"DELETE",
         headers:{
           "Content-Type": "application/json",
-          "auth-token": authToken,
+          "auth-token": localStorage.getItem("token"),
           "semesterID": active._id,
           "subjectID": subjectID,
         },

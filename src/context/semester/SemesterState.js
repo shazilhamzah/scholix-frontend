@@ -3,8 +3,6 @@ import SemesterContext from "./SemesterContext";
 import Swal from "sweetalert2";
 
 const host = "http://localhost:5000";
-const authToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY5NjQ5OWExNDNhZWRmNWIxNWQzNGZjIn0sImlhdCI6MTcyMTEyNTMxNH0.hvbRFYZo-DrqCidjhMSBFR42QkLoWz4NGWD9NzaPUKc";
 
 const SemesterState = (props) => {
   const [semesters, setSemesters] = useState([]);
@@ -43,7 +41,7 @@ const SemesterState = (props) => {
       headers: {
         "Content-Type": "application/json",
         // "auth-token": localStorage.getItem("token"),
-        "auth-token": authToken,
+        "auth-token": localStorage.getItem("token"),
       },
     });
     const a = await response.json();
@@ -59,7 +57,7 @@ const SemesterState = (props) => {
       headers: {
         "Content-Type": "application/json",
         // "auth-token": localStorage.getItem("token"),
-        "auth-token": authToken,
+        "auth-token": localStorage.getItem("token"),
       },
       body: JSON.stringify({ name,sgpa }),
     });
@@ -74,7 +72,7 @@ const SemesterState = (props) => {
         headers:{
           "Content-Type": "application/json",
             // "auth-token": localStorage.getItem("token"),
-            "auth-token": authToken,  
+            "auth-token": localStorage.getItem("token"),  
         },
         body: JSON.stringify({ sgpa })
     });
@@ -95,7 +93,7 @@ const SemesterState = (props) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "auth-token": authToken,
+        "auth-token": localStorage.getItem("token"),
       },
       body: JSON.stringify({ semesterId }),
     });
@@ -109,7 +107,7 @@ const SemesterState = (props) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "auth-token": authToken,
+        "auth-token": localStorage.getItem("token"),
       },
     });
     const newsemesters = semesters.filter((sem)=>sem._id!==semesterId);

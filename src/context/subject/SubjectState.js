@@ -3,8 +3,7 @@ import SubjectContext from "./SubjectContext";
 import SemesterContext from "../semester/SemesterContext";
 import Swal from "sweetalert2";
 
-const authToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY5NjQ5OWExNDNhZWRmNWIxNWQzNGZjIn0sImlhdCI6MTcyMTEyNTMxNH0.hvbRFYZo-DrqCidjhMSBFR42QkLoWz4NGWD9NzaPUKc";
+
 const host = "http://localhost:5000";
 
 const SubjectState = (props) => {
@@ -34,7 +33,7 @@ const SubjectState = (props) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "auth-token": authToken,
+        "auth-token": localStorage.getItem("token"),
         semesterID: semesterID,
       },
     });
@@ -55,7 +54,7 @@ const SubjectState = (props) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "auth-token": authToken,
+        "auth-token": localStorage.getItem("token"),
         semesterID: semesterID,
       },
       body: JSON.stringify({
@@ -77,7 +76,7 @@ const SubjectState = (props) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "auth-token": authToken,
+        "auth-token": localStorage.getItem("token"),
         semesterID: semesterID,
       },
       body: JSON.stringify({ grade }),
@@ -98,7 +97,7 @@ const SubjectState = (props) => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "auth-token": authToken,
+          "auth-token": localStorage.getItem("token"),
           semesterID: active._id,
         },
       }
