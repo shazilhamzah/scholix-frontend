@@ -61,7 +61,7 @@ export const Dashboard = () => {
       y+=Number(element.sgpa);
     }
     if(x>=0 && semesters.length!==0){
-      setExcluding(x/semesters.length);
+      setExcluding(x/(semesters.length-1));
     }
     if(y>=0 && semesters.length!==0){
       setIncluding(y/semesters.length);
@@ -156,7 +156,7 @@ export const Dashboard = () => {
                     {active.sgpa}
                   </span>
                 ) : (
-                  <span className="text-3xl font-bold text-white">3.2</span>
+                  <span className="text-3xl font-bold text-white">-</span>
                 )}
               </div>
             </div>

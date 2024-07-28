@@ -11,26 +11,23 @@ export const Semester = () => {
     context;
 
   const subjectContext = useContext(SubjectContext);
-  const { subjects, getSubjects } = subjectContext;
+  const { subjects = [], getSubjects } = subjectContext; // Default to empty array
 
   const [semester, setSemester] = useState({});
-
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [yesAdded, setYesAdded] = useState(false);
-  const refresh = () => window.location.reload(true);
-  const s = useNavigate();
+  const navigate = useNavigate();
 
-  useEffect(()=>{
-    if(!localStorage.getItem("token")){
-      s("/login");
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/login");
     }
-  })
+  }, [navigate]);
 
   useEffect(() => {
     const fetchData = async () => {
       await getSemesters();
     };
-
     fetchData();
   }, [getSemesters]);
 
@@ -49,7 +46,11 @@ export const Semester = () => {
         setSemester(semesters[0]);
       }
     }
-  }, [semesters, active, yesAdded, getSubjects, getSemesters]);
+  }, [semesters, yesAdded, getSubjects]);
+
+  const refresh = () => {
+    window.location.reload(true);
+  };
 
   const onClick = (semester) => {
     setSemester(semester);
@@ -65,10 +66,9 @@ export const Semester = () => {
       setSemester(updatedActive);
       getSubjects(updatedActive._id);
     }
-    console.log(active);
     refresh();
   };
-  
+
   const onClickDelete = async () => {
     Swal.fire({
       title: "Are you sure?",
@@ -86,10 +86,9 @@ export const Semester = () => {
           text: "Your file has been deleted.",
           icon: "success",
         });
+        refresh();
       }
-      window.location.reload();
     });
-
   };
 
   return (
@@ -99,7 +98,7 @@ export const Semester = () => {
           className="upper-row flex justify-between items-center"
           style={{ marginBottom: 10 }}
         >
-          {!semesters.length == 0 ? (
+          {semesters.length > 0 ? (
             <h1 className="text-5xl font-extrabold dark:text-white">
               {semester.name}
             </h1>
@@ -110,7 +109,7 @@ export const Semester = () => {
           )}
           <div className="relative">
             <div>
-              {!semester.active && !semesters.length == 0 && (
+              {!semester.active && semesters.length > 0 && (
                 <button
                   type="button"
                   className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
@@ -189,10 +188,10 @@ export const Semester = () => {
           </div>
         </div>
         <div style={{ marginTop: 30 }}>
-          {!semesters.length == 0 ? (
+          {subjects.length > 0 ? (
             <SubjectTable subjects={subjects} />
           ) : (
-            <></>
+            <p>No subjects available.</p>
           )}
         </div>
       </div>
@@ -200,315 +199,4 @@ export const Semester = () => {
   );
 };
 
-// export const Semester = () => {
-
-//   // const context = useContext(SemesterContext);
-//   // const { semesters, getSemesters } = context;
-
-//   // const [semester,setSemester] = useState({id:"",name:"",sgpa:""})
-//   // useEffect(() => {
-//   //   getSemesters();
-//   // }, []);
-
-//     // const onClick=()=>{console.log("add")}
-//     return (
-//         <>
-//       <div className="p-4 sm:ml-64">
-//         <h1 className="text-5xl font-extrabold dark:text-white" style={{marginBottom:10}}>Semesters</h1>
-//         {semesters.map((semester) => (
-//           <SemesterItem key={semester.id} semester={semester} />
-//         ))}
-
-//         {/* //? THIS DIV IS FOR ADDING A NEW SEMESTER*/}
-//         <Link to="/addsemester">
-//         <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-//           <div className="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//         </div>
-//         </Link>
-
-//         {/* //? THIS DIV ENDS HERE */ }
-
-//       </div>
-//       </>
-//     );
-//   };
-
-// export const Semester = () => {
-//   return (
-//     <div className="p-4 sm:ml-64">
-//       <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-//         {/* <div className="grid grid-cols-3 gap-4 mb-4">
-//           <div className="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//         </div> */}
-//         <div className="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-//           <p className="text-2xl text-gray-400 dark:text-gray-500">
-//             <svg
-//               className="w-3.5 h-3.5"
-//               aria-hidden="true"
-//               xmlns="http://www.w3.org/2000/svg"
-//               fill="none"
-//               viewBox="0 0 18 18"
-//             >
-//               <path
-//                 stroke="currentColor"
-//                 stroke-linecap="round"
-//                 stroke-linejoin="round"
-//                 stroke-width="2"
-//                 d="M9 1v16M1 9h16"
-//               />
-//             </svg>
-//           </p>
-//         </div>
-//         {/* <div className="grid grid-cols-2 gap-4 mb-4">
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//         </div>
-//         <div className="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
-//           <p className="text-2xl text-gray-400 dark:text-gray-500">
-//             <svg
-//               className="w-3.5 h-3.5"
-//               aria-hidden="true"
-//               xmlns="http://www.w3.org/2000/svg"
-//               fill="none"
-//               viewBox="0 0 18 18"
-//             >
-//               <path
-//                 stroke="currentColor"
-//                 stroke-linecap="round"
-//                 stroke-linejoin="round"
-//                 stroke-width="2"
-//                 d="M9 1v16M1 9h16"
-//               />
-//             </svg>
-//           </p>
-//         </div>
-//         <div className="grid grid-cols-2 gap-4">
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//           <div className="flex items-center justify-center rounded bg-gray-50 h-28 dark:bg-gray-800">
-//             <p className="text-2xl text-gray-400 dark:text-gray-500">
-//               <svg
-//                 className="w-3.5 h-3.5"
-//                 aria-hidden="true"
-//                 xmlns="http://www.w3.org/2000/svg"
-//                 fill="none"
-//                 viewBox="0 0 18 18"
-//               >
-//                 <path
-//                   stroke="currentColor"
-//                   stroke-linecap="round"
-//                   stroke-linejoin="round"
-//                   stroke-width="2"
-//                   d="M9 1v16M1 9h16"
-//                 />
-//               </svg>
-//             </p>
-//           </div>
-//         </div> */}
-//       </div>
-//     </div>
-//   );
-// };
+export default Semester;
