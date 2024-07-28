@@ -38,9 +38,29 @@ const SubjectState = (props) =>{
         console.log(a);
     }
 
+    const addGrade = async(semesterID,subjectID,grade)=>{
+        const response = await fetch(`${host}/api/subject/addgrade/${subjectID}`,{
+            method:'POST',
+            headers:{
+                "Content-Type": "application/json",
+                "auth-token":authToken,
+                "semesterID":semesterID
+            },
+            body:JSON.stringify({grade})
+        });
+        const a = await response.json();
+        for (let i = 0; i < subjects.length; i++) {
+            const element = subjects[i];
+            if(element._id===subjectID){
+                subjects[i].grade = grade;
+            }
+        }
+        console.log(a);
+    }
+
 
     return (
-        <SubjectContext.Provider value={{ subjects,getSubjects,addSubject }}>
+        <SubjectContext.Provider value={{ subjects,getSubjects,addSubject,addGrade }}>
           {props.children}
         </SubjectContext.Provider>
       );

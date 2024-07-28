@@ -1,6 +1,7 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import ExamContext from "../exam/ExamContext";
 import SubjectContext from "../subject/SubjectContext";
+import SemesterContext from "../semester/SemesterContext";
 
 const host = "http://localhost:5000";
 const authToken =
@@ -9,8 +10,9 @@ const authToken =
 const ExamState = (props) => {
   const [exams, setExams] = useState([]);
 
-  const {subjects} = useContext(SubjectContext);
-  const calcAndAddGrade = (subjectID, obtainedWeightage, examWeightage) => {
+  const {subjects,addGrade} = useContext(SubjectContext);
+  const {active} = useContext(SemesterContext);
+  const calcAndAddGrade = async (subjectID, obtainedWeightage, examWeightage) => {
     let obtainedWeightages = 0;
     let allWeightages = 0;
     let percentage = 0;
@@ -28,13 +30,12 @@ const ExamState = (props) => {
 
     if(obtainedWeightages!==0 && allWeightages !==0){
       percentage = obtainedWeightages/allWeightages*100;
-      console.log(subjects);
-      const subjectssss = subjects.filter((subject)=>subject._id==subjectID);
+      const subjectssss = subjects.filter((subject)=>subject._id===subjectID);
       let grade;
-      if(subjectssss[0].grading=="Relative"){
-
+      if(subjectssss[0].grading==="Relative"){
+        grade = 'B';
       }
-      else if(subjectssss[0].grading=="Absolute"){
+      else if(subjectssss[0].grading==="Absolute"){
         if (percentage >= 90) {
           grade = 'A+';
         } else if (percentage >= 86) {
@@ -54,14 +55,14 @@ const ExamState = (props) => {
         } else if (percentage >= 58) {
           grade = 'C-';
         } else if (percentage >= 54) {
-          grade = 'D+';
+          grade = 'D+'; 
         } else if (percentage >= 50) {
           grade = 'D';
         } else {
           grade = 'F';
         }
       }
-      console.log(grade);
+      addGrade(active._id,subjectID,grade);
     }
   };
 
@@ -98,7 +99,6 @@ const ExamState = (props) => {
         body: JSON.stringify({ examType,totalMarks,obtainedMarks,averageMarks,weightage }),
       })
       const a = await response.json()
-      console.log(a);
       setExams([...exams,a]);
       if(a.success===true){
         calcAndAddGrade(subjectID,(((weightage*((obtainedMarks/totalMarks)*100))/100).toFixed(3)),(weightage));
