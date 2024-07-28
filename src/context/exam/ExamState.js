@@ -2,16 +2,22 @@ import { useState, useContext } from "react";
 import ExamContext from "../exam/ExamContext";
 import SubjectContext from "../subject/SubjectContext";
 import SemesterContext from "../semester/SemesterContext";
+import Swal from "sweetalert2";
 
 const host = "http://localhost:5000";
 const authToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY5NjQ5OWExNDNhZWRmNWIxNWQzNGZjIn0sImlhdCI6MTcyMTEyNTMxNH0.hvbRFYZo-DrqCidjhMSBFR42QkLoWz4NGWD9NzaPUKc";
 
 const ExamState = (props) => {
+
+  // STATES
   const [exams, setExams] = useState([]);
 
+  // CONTEXTS
   const {subjects,addGrade} = useContext(SubjectContext);
-  const {active} = useContext(SemesterContext);
+  const {active,addSGPA} = useContext(SemesterContext);
+
+  // FUNCTIONS
   const calcAndAddGrade = async (subjectID, obtainedWeightage, examWeightage) => {
     let obtainedWeightages = 0;
     let allWeightages = 0;
@@ -65,6 +71,68 @@ const ExamState = (props) => {
       addGrade(active._id,subjectID,grade);
     }
   };
+  const calcAndAddSGPA = async (subjectID) =>{
+    let index = 0;
+    let sgpa = 0;
+    for (index; index < subjects.length; index++) {
+      const element = subjects[index];
+      let grade = element.grade;
+      if(grade){
+        if(grade==="A+" || grade==="A"){
+          sgpa+=4.0;
+        }
+        else if(grade==="A-"){
+          sgpa+=3.67;
+        }
+        else if(grade==="B+"){
+          sgpa+=3.33;
+        }
+        else if(grade==="B"){
+          sgpa+=3;
+        }
+        else if(grade==="B-"){
+          sgpa+=2.67;
+        }
+        else if(grade==="C+"){
+          sgpa+=2.33;
+        }
+        else if(grade==="C"){
+          sgpa+=2;
+        }
+        else if(grade==="C-"){
+          sgpa+=1.67;
+        }
+        else if(grade==="D+"){
+          sgpa+=1.33;
+        }
+        else if(grade==="D"){
+          sgpa+=1;
+        }
+        else if(grade==="F"){
+          sgpa+=0.0;
+        }
+      }
+    }
+    await addSGPA(active._id,sgpa/index);
+  };
+  const alert = (a)=>{
+    if(a){
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Exam added successfully",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+    else{
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error adding exam",
+      });
+    }
+  }
 
   // FETCH EXAMS
   const getExams = async (semesterID, subjectID) => {
@@ -102,15 +170,32 @@ const ExamState = (props) => {
       setExams([...exams,a]);
       if(a.success===true){
         calcAndAddGrade(subjectID,(((weightage*((obtainedMarks/totalMarks)*100))/100).toFixed(3)),(weightage));
+        calcAndAddSGPA(subjectID);
       }
+      alert(a.success);
     } catch (error) {
       console.error("Error adding exams:", error);
     }
+  };
+
+  const deleteExam = async(subjectID,examID)=>{
+    const response = await fetch(`${host}/api/exam/deleteexam/${examID}`,
+      {
+        method:"DELETE",
+        headers:{
+          "Content-Type": "application/json",
+          "auth-token": authToken,
+          "semesterID": active._id,
+          "subjectID": subjectID,
+        },
+      }
+    )
+    const newExams = exams.filter((exam)=>exam._id!==examID);
+    setExams(newExams);
   }
   
-
   return (
-    <ExamContext.Provider value={{ exams, getExams,addExam }}>
+    <ExamContext.Provider value={{ exams, getExams,addExam,deleteExam }}>
       {props.children}
     </ExamContext.Provider>
   );

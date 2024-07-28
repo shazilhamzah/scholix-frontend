@@ -1,12 +1,14 @@
 import SemesterContext from "../../context/semester/SemesterContext";
 import { useContext, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SubjectContext from "../../context/subject/SubjectContext";
 import SubjectTable from "../semester/SubjectTable";
+import Swal from "sweetalert2";
 
 export const Semester = () => {
   const context = useContext(SemesterContext);
-  const { semesters, active, getSemesters, setActiveSemester } = context;
+  const { semesters, active, getSemesters, setActiveSemester, deleteSemester } =
+    context;
 
   const subjectContext = useContext(SubjectContext);
   const { subjects, getSubjects } = subjectContext;
@@ -59,6 +61,29 @@ export const Semester = () => {
     console.log(active);
     refresh();
   };
+  
+  const onClickDelete = async () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteSemester(semester._id);
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+      }
+      window.location.reload();
+    });
+
+  };
 
   return (
     <>
@@ -85,6 +110,17 @@ export const Semester = () => {
                   onClick={activeBtnClicked}
                 >
                   Set semester as active
+                </button>
+              )}
+              {semesters.length === 0 ? (
+                <p></p>
+              ) : (
+                <button
+                  type="button"
+                  className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                  onClick={onClickDelete}
+                >
+                  Delete Semester
                 </button>
               )}
 

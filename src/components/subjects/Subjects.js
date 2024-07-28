@@ -226,6 +226,7 @@ const Subjects = () => {
                     <ExamTable
                       key={`${section.type}-${subject._id}`}
                       subject={section.exams}
+                      s={subject}
                     />
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <Link

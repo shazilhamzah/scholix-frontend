@@ -1,5 +1,6 @@
 import { useState,useEffect } from "react";
 import SemesterContext from "./SemesterContext";
+import Swal from "sweetalert2";
 
 const host = "http://localhost:5000";
 const authToken =
@@ -15,6 +16,25 @@ const SemesterState = (props) => {
       setActive(JSON.parse(activeSemester));
     }
   }, []);
+
+  const alert = (isSuccess)=>{
+    if(isSuccess){
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Semester added successfully.",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+    else{
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error adding semester!",
+      });
+    }
+  }
 
   // FETCH NOTES
   const getSemesters = async () => {
@@ -44,12 +64,11 @@ const SemesterState = (props) => {
       body: JSON.stringify({ name,sgpa }),
     });
     const a = await response.json();
-    console.log(a);
+    alert(a.success);
     setSemesters([...semesters, a]);
   };
 
   const addSGPA = async (id, sgpa) => {
-    console.log(id)
     const response = await fetch(`${host}/api/semester/addsgpa/${id}`, {
         method:"POST",
         headers:{
@@ -69,7 +88,6 @@ const SemesterState = (props) => {
       }
       setSemesters(newsemesters);
       const a = await response.json();
-      console.log(a)  
   };
 
   const setActiveSemester = async (semesterId) => {
@@ -84,11 +102,22 @@ const SemesterState = (props) => {
     const data = await response.json();
     setActive(data);
     localStorage.setItem('activeSemester', JSON.stringify(data));
-    console.log(active)
   };
 
+  const deleteSemester = async (semesterId)=>{
+    const response = await fetch(`${host}/api/semester/deletesemester/${semesterId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token": authToken,
+      },
+    });
+    const newsemesters = semesters.filter((sem)=>sem._id!==semesterId);
+    setSemesters(newsemesters);
+  }
+
   return (
-    <SemesterContext.Provider value={{ semesters,active, getSemesters, addSemester,addSGPA,setActiveSemester }}>
+    <SemesterContext.Provider value={{ semesters,active, getSemesters, addSemester,addSGPA,setActiveSemester,deleteSemester }}>
       {props.children}
     </SemesterContext.Provider>
   );

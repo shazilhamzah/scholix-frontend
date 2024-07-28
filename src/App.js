@@ -11,6 +11,7 @@ import { AddSubject } from "./components/subjects/AddSubject";
 import { AddExam } from "./components/subjects/AddExam";
 
 import { Sidebar } from "./components/Sidebar";
+import { Dashboard } from "./components/dashboard/Dashboard";
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             <SubjectState>
               <ExamState>
               <Routes>
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/semesters" element={<Semester />} />
               <Route path="/addsemester" element={<AddSemester/>}/>
               <Route path="/subjects" element={<Subjects/>}/>

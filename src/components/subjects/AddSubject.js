@@ -19,7 +19,6 @@ export const AddSubject = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const onClick = async () => {
-    console.log("Teacher Name Input:", teacherNameInput);
     const a = await addSubject(active._id, subjectInput,creditHrsInput,subejctTypeInput,gradingTypeInput,gradeInput,teacherNameInput);
   };  
 
