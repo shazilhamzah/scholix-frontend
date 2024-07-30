@@ -10,7 +10,6 @@ export const AddSemester = () => {
   const [sgpaInput, setsgpaInput] = useState();
   const onClick = async () => {
       const a = await addSemester(semesterInput,sgpaInput);
-      console.log(a);
   };
 
   const onChangeSemester = (event) => {

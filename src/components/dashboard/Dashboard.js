@@ -11,9 +11,10 @@ export const Dashboard = () => {
   const [excluding, setExcluding] = useState();
   const [including, setIncluding] = useState();
 
+
   // CONTEXTS
   const semesterContext = useContext(SemesterContext);
-  const { active,semesters,getSemesters } = semesterContext;
+  const { active,semesters,getSemesters,user,getUser } = semesterContext;
 
 
   // SETTING DATE + GETTING SEMESTERS
@@ -34,7 +35,7 @@ export const Dashboard = () => {
         "November",
         "December",
       ];
-  
+
       const d = new Date();
       let name = month[d.getMonth()];
       let date = d.getDate();
@@ -42,12 +43,16 @@ export const Dashboard = () => {
       setDate(date);
       setMonth(name);
       setYear(year);
-      getSemesters();
     }
     else{
       s("/login")
     }
   });
+
+  useEffect(()=>{
+    // getUser();
+    // getSemesters();
+  })
 
   // SETTING EXCLUDING AND INCLUDING CGPA'S
   useEffect(()=>{
@@ -67,16 +72,9 @@ export const Dashboard = () => {
       setIncluding(y/semesters.length);
     }
   })
-
-
-
-  const onClick=()=>{
-
-  }
-
+  
   return (
     <>
-    <button onClick={()=>onClick()}>test button</button>
       <div className="p-4 sm:ml-64">
         <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
           {/* NAME BLOCK */}
@@ -96,7 +94,7 @@ export const Dashboard = () => {
               </p>
               <div>
                 <h3 className="text-white text-3xl font-bold">
-                  Welcome, Muhammad Shazil Hamzah
+                  {user?`Welcome, ${user.name}`:"-"}
                 </h3>
                 <p className="text-white text-1xl">
                   Always stay updated on your student portal
@@ -117,7 +115,7 @@ export const Dashboard = () => {
                   CGPA excluding active semester
                 </span>
                 <br />
-                {(excluding>=0) ? (
+                {(excluding>=0&&excluding<=10) ? (
                   <span className="text-3xl font-bold text-white">
                     {excluding}
                   </span>
@@ -135,7 +133,7 @@ export const Dashboard = () => {
                   CGPA including active semester
                 </span>
                 <br />
-                {(including>=0) ? (
+                {(including>=0&&including<=10) ? (
                   <span className="text-3xl font-bold text-white">
                     {including}
                   </span>

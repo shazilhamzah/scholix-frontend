@@ -16,7 +16,6 @@ const UserState = (props) =>{
             body:JSON.stringify({cgpa})
         });
         const a = await response.json();
-        console.log(a);
     }
 
 
