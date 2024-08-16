@@ -19,6 +19,7 @@ import { Login } from "./components/auth/Login";
 import { Signup } from "./components/auth/Signup";
 import { useEffect } from "react";
 import { Home } from "./components/home/Home";
+import { NewDashboard } from "./components/sidebar/Sidebar";
 
 function Layout({ children }) {
   const location = useLocation();

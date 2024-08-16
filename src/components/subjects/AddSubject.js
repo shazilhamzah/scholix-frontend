@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import React from "react";
 import SemesterContext from "../../context/semester/SemesterContext";
 import SubjectContext from "../../context/subject/SubjectContext";
+import Swal from "sweetalert2";
 
 export const AddSubject = () => {
   const context = useContext(SubjectContext);
@@ -13,7 +14,7 @@ export const AddSubject = () => {
   const [subjectInput, setsubjectInput] = useState("");
   const [creditHrsInput, setcreditHrsInput] = useState("");
   const [subejctTypeInput, setSubejctTypeInput] = useState("");
-  const [gradingTypeInput, setGradingTypeInput] = useState("Select Grading Type");
+  const [gradingTypeInput, setGradingTypeInput] = useState("");
   const [gradeInput, setGradeInput] = useState("");
   const [teacherNameInput, setteacherNameInput] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -51,6 +52,29 @@ export const AddSubject = () => {
       setGradingTypeInput(s);
       setDropdownOpen(false);
     }
+  };
+
+  const alert = (isSuccess)=>{
+    if(isSuccess){
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Exam added successfully.",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+    else{
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error adding subject!",
+      });
+    }
+  }
+
+  const onClickWrong = () => {
+    alert(false);
   };
 
   return (
@@ -134,7 +158,7 @@ export const AddSubject = () => {
               type="button"
               onClick={toggleDropdown}
             >
-              {gradingTypeInput}
+              {gradingTypeInput?gradingTypeInput:"Select grading type"}
             </button>
             {dropdownOpen && (
               <div
@@ -197,13 +221,21 @@ export const AddSubject = () => {
               onChange={onChangeTeacher}
             />
           </div>
-          <Link
+          {
+            subjectInput&&creditHrsInput&&gradingTypeInput&&subjectInput.length>=2?<Link
             to="/subjects"
             className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             onClick={onClick}
           >
             Add
-          </Link>
+          </Link>:<Link
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 opacity-50"
+              onClick={onClickWrong}
+            >
+              Add
+            </Link>
+          }
+
         </form>
       </div>
     </>

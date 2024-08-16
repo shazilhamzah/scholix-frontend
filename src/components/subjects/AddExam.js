@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import SemesterContext from "../../context/semester/SemesterContext";
 import ExamContext from "../../context/exam/ExamContext";
+import Swal from "sweetalert2";
 
 export const AddExam = () => {
   // STATES
@@ -16,7 +17,7 @@ export const AddExam = () => {
   // CONTEXTS
   const semcontext = useContext(SemesterContext);
   const { active } = semcontext;
-  const { addExam } = useContext(ExamContext);
+  const { addExam, calcAndAddSGPA } = useContext(ExamContext);
 
   // Retrieve the subjectID from state
   const location = useLocation();
@@ -71,8 +72,32 @@ export const AddExam = () => {
         weightageInput
       );
     } catch (error) {
-      console.error("Error adding exam",error);
+      console.error("Error adding exam", error);
     }
+    calcAndAddSGPA(id.id);
+  };
+
+  const alert = (isSuccess)=>{
+    if(isSuccess){
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Exam added successfully.",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+    else{
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error adding exam!",
+      });
+    }
+  }
+
+  const onClickWrong = () => {
+    alert(false);
   };
 
   return (
@@ -88,98 +113,6 @@ export const AddExam = () => {
         </h1>
 
         <form className="mx-auto max-w-sm align-center mt-5">
-          {/* EXAM TYPE - START
-
-          <div className="mb-4">
-            <div className="flex gap-2">
-              <label
-                htmlFor="examType"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Exam Type
-              </label>
-              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
-                *Required
-              </span>
-            </div>
-            <button
-              id="dropdownDefaultButton"
-              data-dropdown-toggle="dropdown"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              type="button"
-              onClick={toggleDropdown}
-            >
-              {examTypeInput}
-            </button>
-            {dropdownOpen && (
-              <div
-                id="data-dropdown-toggle"
-                className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
-              >
-                <ul
-                  className="py-2 text-sm text-gray-700 dark:text-gray-200"
-                  aria-labelledby="dropdownDefaultButton"
-                >
-                  <li>
-                    <button
-                      type="button"
-                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={examTypeInputFunction("Quiz")}
-                    >
-                      Quiz
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={examTypeInputFunction("MidTerm")}
-                    >
-                      MidTerm
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={examTypeInputFunction("Assignment")}
-                    >
-                      Assignment
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={examTypeInputFunction("Project")}
-                    >
-                      Project
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={examTypeInputFunction("Homework")}
-                    >
-                      Homework
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                      onClick={examTypeInputFunction("Final")}
-                    >
-                      Final
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div> */}
-
-          {/* TOTAL MARKS - START */}
 
           <div className="mb-4">
             <div className="flex gap-2">
@@ -276,13 +209,25 @@ export const AddExam = () => {
           </div>
 
           {/* ADD BUTTON - START */}
-          <Link
-            to="/subjects"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            onClick={onClick}
-          >
-            Add
-          </Link>
+          {totalMarksInput &&
+          obtainedMarksInput &&
+          weightageInput &&
+          averageMarksInput ? (
+            <Link
+              to="/subjects"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              onClick={onClick}
+            >
+              Add
+            </Link>
+          ) : (
+            <Link
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 opacity-50"
+              onClick={onClickWrong}
+            >
+              Add
+            </Link>
+          )}
         </form>
       </div>
 

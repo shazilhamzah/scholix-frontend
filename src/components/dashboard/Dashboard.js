@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import SemesterContext from "../../context/semester/SemesterContext";
+import ExamContext from "src/context/exam/ExamContext";
 
 export const Dashboard = () => {
   // STATES
@@ -11,10 +12,15 @@ export const Dashboard = () => {
   const [excluding, setExcluding] = useState();
   const [including, setIncluding] = useState();
 
+  const [activeSGPA,setActiveSGPA] = useState();
+  let [checkActive,setCheckActive] = useState(false);
+
 
   // CONTEXTS
   const semesterContext = useContext(SemesterContext);
   const { active,semesters,getSemesters,user,getUser } = semesterContext;
+  
+  const examContext = useContext(ExamContext);
 
 
   // SETTING DATE + GETTING SEMESTERS
@@ -43,39 +49,47 @@ export const Dashboard = () => {
       setDate(date);
       setMonth(name);
       setYear(year);
+      getUser();
     }
     else{
       s("/login")
     }
-  });
-
-  useEffect(()=>{
-    // getUser();
-    // getSemesters();
-  })
+  },[]);
 
   // SETTING EXCLUDING AND INCLUDING CGPA'S
-  useEffect(()=>{
-    let x = 0;
-    let y = 0;
-    for (let index = 0; index < semesters.length; index++) {
-      const element = semesters[index];
-      if(!element.active){
-        x+=Number(element.sgpa);
+  useEffect(() => {
+    if (semesters.length > 0) {
+      let x = 0;
+      let y = 0;
+      let isActiveFound = false;
+      for (let index = 0; index < semesters.length; index++) {
+        const element = semesters[index];
+        if(element.active){
+          setCheckActive(true);
+          setActiveSGPA(element.sgpa) 
+        }
+        if (!element.active) {
+          x += Number(element.sgpa);
+        }
+        y += Number(element.sgpa);
       }
-      y+=Number(element.sgpa);
+      if (semesters.length > 1) {
+        if(checkActive){
+          setExcluding((x / (semesters.length-1)).toFixed(3));
+        }
+        else{
+          setExcluding((x / (semesters.length)).toFixed(3));
+        }
+      }
+      setIncluding((y / semesters.length).toFixed(3));
     }
-    if(x>=0 && semesters.length!==0){
-      setExcluding(x/(semesters.length-1));
-    }
-    if(y>=0 && semesters.length!==0){
-      setIncluding(y/semesters.length);
-    }
-  })
+  }, [semesters, active, getSemesters]);
+  
   
   return (
     <>
-      <div className="p-4 sm:ml-64">
+      <div className="p-4 sm:ml-64 rounded-md">
+
         <div className="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
           {/* NAME BLOCK */}
           <div
@@ -149,9 +163,9 @@ export const Dashboard = () => {
               <div className="text-center">
                 <span className="text-sm text-white">Active semester SGPA</span>
                 <br />
-                {(active.sgpa>=0) ? (
+                {(active&&active.sgpa>=0) ? (
                   <span className="text-3xl font-bold text-white">
-                    {active.sgpa}
+                    {activeSGPA}
                   </span>
                 ) : (
                   <span className="text-3xl font-bold text-white">-</span>

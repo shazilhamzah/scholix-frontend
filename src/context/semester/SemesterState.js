@@ -35,6 +35,7 @@ const SemesterState = (props) => {
     }
   }
 
+
   // FETCH USER
   const getUser = async () => {
     const response = await fetch(`${host}/api/auth/getuser`, {
@@ -104,8 +105,13 @@ const SemesterState = (props) => {
         }
       }
       setSemesters(newsemesters);
-      const a = await response.json();
-  };
+      for (let index = 0; index < semesters.length; index++) {
+        const element = semesters[index];
+        if(element.active){
+          setActive(element);
+        }
+      }
+    };
 
   const setActiveSemester = async (semesterId) => {
     const response = await fetch(`${host}/api/semester/toggleactive/${semesterId}`, {
