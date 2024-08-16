@@ -211,7 +211,8 @@ export const Semester = () => {
   const [semester, setSemester] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [manualSelection, setManualSelection] = useState(false); // Track manual selection
-  const [hasFetchedSubjects, setHasFetchedSubjects] = useState(false);  // fetching subject true and false
+  const [hasFetchedSubjects, setHasFetchedSubjects] = useState(false); // fetching subject true and false
+  let [trash, setTrash] = useState(0);
   const navigate = useNavigate();
 
   // Fetch semesters and subjects when the component mounts
@@ -233,16 +234,26 @@ export const Semester = () => {
   useEffect(() => {
     if (semesters.length > 0 && !manualSelection) {
       const activeSemester = semesters.find((sem) => sem.active);
-      if (activeSemester && !hasFetchedSubjects) {
+      if (activeSemester) {
         setSemester(activeSemester);
-        getSubjects(activeSemester._id);
       } else {
         setSemester(semesters[0]);
-        getSubjects(semesters[0]._id);
-        setHasFetchedSubjects(true);
       }
     }
-  }, [semesters, getSubjects, manualSelection,hasFetchedSubjects]);
+  }, [semesters, manualSelection, hasFetchedSubjects]);
+
+  useEffect(() => {
+    if (semesters.length > 0) {
+      const activeSemester = semesters.find((sem) => sem.active);
+      if (activeSemester && !hasFetchedSubjects) {
+        getSubjects(activeSemester._id);
+        // setHasFetchedSubjects(true);
+      } else {
+        getSubjects(semesters[0]._id);
+        // setHasFetchedSubjects(true);
+      }
+    }
+  }, [semesters, hasFetchedSubjects]);
 
   // Handle semester selection
   const onClick = (selectedSemester) => {
@@ -280,8 +291,8 @@ export const Semester = () => {
           text: "Your semester has been deleted.",
           icon: "success",
         });
-        getSemesters(); 
-        refresh();  
+        getSemesters();
+        refresh();
       }
     });
   };
