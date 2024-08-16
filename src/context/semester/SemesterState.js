@@ -2,7 +2,7 @@ import { useState,useEffect } from "react";
 import SemesterContext from "./SemesterContext";
 import Swal from "sweetalert2";
 
-const host = "http://localhost:5000";
+const host = process.env.REACT_APP_BACKEND_HOST;
 
 const SemesterState = (props) => {
   const [semesters, setSemesters] = useState([]);

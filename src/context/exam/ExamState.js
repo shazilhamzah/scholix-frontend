@@ -4,7 +4,7 @@ import SubjectContext from "../subject/SubjectContext";
 import SemesterContext from "../semester/SemesterContext";
 import Swal from "sweetalert2";
 
-const host = "http://localhost:5000";
+const host = process.env.REACT_APP_BACKEND_HOST;
 
 const ExamState = (props) => {
   // STATES

@@ -4,7 +4,7 @@ import SemesterContext from "../semester/SemesterContext";
 import Swal from "sweetalert2";
 
 
-const host = "http://localhost:5000";
+const host = process.env.REACT_APP_BACKEND_HOST;
 
 const SubjectState = (props) => {
   const { active } = useContext(SemesterContext);
@@ -69,6 +69,7 @@ const SubjectState = (props) => {
     const a = await response.json();
     alert(a.success);
     setSubjects([...subjects, a]);
+    
   };
 
   const addGrade = async (semesterID, subjectID, grade) => {

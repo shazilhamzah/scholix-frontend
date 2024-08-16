@@ -7,9 +7,9 @@ import Swal from "sweetalert2";
 
 export const AddSubject = () => {
   const context = useContext(SubjectContext);
-  const {addSubject} = context;
+  const { addSubject } = context;
   const semcontext = useContext(SemesterContext);
-  const {active} = semcontext;
+  const { active } = semcontext;
 
   const [subjectInput, setsubjectInput] = useState("");
   const [creditHrsInput, setcreditHrsInput] = useState("");
@@ -20,8 +20,16 @@ export const AddSubject = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const onClick = async () => {
-    const a = await addSubject(active._id, subjectInput,creditHrsInput,subejctTypeInput,gradingTypeInput,gradeInput,teacherNameInput);
-  };  
+    const a = await addSubject(
+      active._id,
+      subjectInput,
+      creditHrsInput,
+      subejctTypeInput,
+      gradingTypeInput,
+      gradeInput,
+      teacherNameInput
+    );
+  };
 
   const onChangeSubject = (event) => {
     setsubjectInput(event.target.value);
@@ -38,7 +46,7 @@ export const AddSubject = () => {
   const onChangeGrade = (event) => {
     setGradeInput(event.target.value);
   };
-  
+
   const onChangeTeacher = (event) => {
     setteacherNameInput(event.target.value);
   };
@@ -54,24 +62,23 @@ export const AddSubject = () => {
     }
   };
 
-  const alert = (isSuccess)=>{
-    if(isSuccess){
+  const alert = (isSuccess) => {
+    if (isSuccess) {
       Swal.fire({
         position: "center",
         icon: "success",
         title: "Exam added successfully.",
         showConfirmButton: false,
-        timer: 1500
+        timer: 1500,
       });
-    }
-    else{
+    } else {
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Error adding subject!",
       });
     }
-  }
+  };
 
   const onClickWrong = () => {
     alert(false);
@@ -86,16 +93,21 @@ export const AddSubject = () => {
         >
           Add Subject
         </h1>
+        <div class="alert alert-warning" role="alert">
+          Relative grading scheme is currently unimplemented! It will be added in future updates.
+        </div>
         <form className="mx-auto max-w-sm align-center mt-5">
           <div className="mb-3">
             <div className="flex gap-2">
-            <label
-              htmlFor="subject"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Subject name
-            </label>
-            <span className="block text-sm font-medium text-red-700 dark:text-white italic">*Required</span>
+              <label
+                htmlFor="subject"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Subject name
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
             </div>
             <input
               type="text"
@@ -109,13 +121,15 @@ export const AddSubject = () => {
           </div>
           <div className="mb-4">
             <div className="flex gap-2">
-            <label
-              htmlFor="credithrs"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Credit Hrs.{" "}
-            </label>
-            <span className="block text-sm font-medium text-red-700 dark:text-white italic">*Required</span>
+              <label
+                htmlFor="credithrs"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Credit Hrs.{" "}
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
             </div>
             <input
               type="number"
@@ -143,13 +157,15 @@ export const AddSubject = () => {
           </div>
           <div className="mb-4">
             <div className="flex gap-2">
-            <label
-              htmlFor="grading"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Grading Type
-            </label>
-            <span className="block text-sm font-medium text-red-700 dark:text-white italic">*Required</span>
+              <label
+                htmlFor="grading"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Grading Type
+              </label>
+              <span className="block text-sm font-medium text-red-700 dark:text-white italic">
+                *Required
+              </span>
             </div>
             <button
               id="dropdownDefaultButton"
@@ -158,7 +174,7 @@ export const AddSubject = () => {
               type="button"
               onClick={toggleDropdown}
             >
-              {gradingTypeInput?gradingTypeInput:"Select grading type"}
+              {gradingTypeInput ? gradingTypeInput : "Select grading type"}
             </button>
             {dropdownOpen && (
               <div
@@ -169,7 +185,7 @@ export const AddSubject = () => {
                   className="py-2 text-sm text-gray-700 dark:text-gray-200"
                   aria-labelledby="dropdownDefaultButton"
                 >
-                  <li>
+                  {/* <li>
                     <button
                       type="button"
                       className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
@@ -177,7 +193,7 @@ export const AddSubject = () => {
                     >
                       Relative
                     </button>
-                  </li>
+                  </li> */}
                   <li>
                     <button
                       type="button"
@@ -221,21 +237,25 @@ export const AddSubject = () => {
               onChange={onChangeTeacher}
             />
           </div>
-          {
-            subjectInput&&creditHrsInput&&gradingTypeInput&&subjectInput.length>=2?<Link
-            to="/subjects"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            onClick={onClick}
-          >
-            Add
-          </Link>:<Link
+          {subjectInput &&
+          creditHrsInput &&
+          gradingTypeInput &&
+          subjectInput.length >= 2 ? (
+            <Link
+              to="/subjects"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              onClick={onClick}
+            >
+              Add
+            </Link>
+          ) : (
+            <Link
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 opacity-50"
               onClick={onClickWrong}
             >
               Add
             </Link>
-          }
-
+          )}
         </form>
       </div>
     </>

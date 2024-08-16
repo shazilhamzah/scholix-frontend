@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import { IconArrowRight, IconBrandGoogle,IconQuestionMark } from "@tabler/icons-react";
-const host = "http://localhost:5000";
+const host = process.env.REACT_APP_BACKEND_HOST;
 
 export function SignUpForm() {
   // STATES
@@ -60,7 +60,7 @@ export function SignUpForm() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+    window.location.href = `${host}/api/auth/google`;
   };
 
   return (

@@ -173,7 +173,7 @@ export const Dashboard = () => {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
+          {/* <div className="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
             <p className="text-2xl text-gray-400 dark:text-gray-500">
               <svg
                 className="w-3.5 h-3.5"
@@ -366,8 +366,8 @@ export const Dashboard = () => {
                   />
                 </svg>
               </p>
-            </div>
-          </div>
+            </div> */}
+          {/* </div> */}
         </div>
       </div>
     </>
