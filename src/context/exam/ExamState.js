@@ -188,6 +188,7 @@ const ExamState = (props) => {
       let grade;
       if (subject.grading === "Relative") {
         try {
+          console.log("average",average);
           grade = getGradeForAverage(average, percentage);
         } catch (error) {
           console.error(error.message);
