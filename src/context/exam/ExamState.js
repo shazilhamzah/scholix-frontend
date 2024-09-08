@@ -5,6 +5,7 @@ import SemesterContext from "../semester/SemesterContext";
 import Swal from "sweetalert2";
 
 const host = process.env.REACT_APP_BACKEND_HOST;
+const XLSX = require("xlsx");
 
 const ExamState = (props) => {
   // STATES
@@ -15,64 +16,7 @@ const ExamState = (props) => {
   const { active, addSGPA } = useContext(SemesterContext);
 
   // FUNCTIONS
-  // const calcAndAddGrade = async (
-  //   subjectID,
-  //   obtainedWeightage,
-  //   examWeightage
-  // ) => {
-  //   let obtainedWeightages = 0;
-  //   let allWeightages = 0;
-  //   let percentage = 0;
 
-  //   for (let i = 0; i < exams.length; i++) {
-  //     const element = exams[i];
-  //     obtainedWeightages += Number(element.obtainedWeightage);
-  //   }
-  //   obtainedWeightages += Number(obtainedWeightage);
-  //   for (let i = 0; i < exams.length; i++) {
-  //     const element = exams[i];
-  //     allWeightages += Number(element.weightage);
-  //   }
-  //   allWeightages += Number(examWeightage);
-
-  //   if (obtainedWeightages !== 0 && allWeightages !== 0) {
-  //     percentage = (obtainedWeightages / allWeightages) * 100;
-  //     const subjectssss = subjects.filter(
-  //       (subject) => subject._id === subjectID
-  //     );
-  //     let grade;
-  //     if (subjectssss[0].grading === "Relative") {
-  //       grade = "B";
-  //     } else if (subjectssss[0].grading === "Absolute") {
-  //       if (percentage >= 90) {
-  //         grade = "A+";
-  //       } else if (percentage >= 86) {
-  //         grade = "A";
-  //       } else if (percentage >= 82) {
-  //         grade = "A-";
-  //       } else if (percentage >= 78) {
-  //         grade = "B+";
-  //       } else if (percentage >= 74) {
-  //         grade = "B";
-  //       } else if (percentage >= 70) {
-  //         grade = "B-";
-  //       } else if (percentage >= 66) {
-  //         grade = "C+";
-  //       } else if (percentage >= 62) {
-  //         grade = "C";
-  //       } else if (percentage >= 58) {
-  //         grade = "C-";
-  //       } else if (percentage >= 54) {
-  //         grade = "D+";
-  //       } else if (percentage >= 50) {
-  //         grade = "D";
-  //       } else {
-  //         grade = "F";
-  //       }
-  //     }
-  //     addGrade(active._id, subjectID, grade);
-  //   }
-  // };
   const calcAndAddSGPA = async (subjectID) => {
     let index = 0;
     let sgpa = 0;
@@ -143,45 +87,101 @@ const ExamState = (props) => {
     return "F";
   };
 
+  function getGradeForAverage(excelFilePath, MCA, averageScore) {
+    // Read the Excel file
+    const workbook = XLSX.readFile(excelFilePath);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    // Convert sheet to JSON
+    const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    // Find the row with the given MCA value
+    const headers = data[0];
+    let mcaRowIndex = -1;
+    for (let i = 2; i < data.length; i++) {
+      if (data[i][0] === MCA) {
+        mcaRowIndex = i;
+        break;
+      }
+    }
+
+    if (mcaRowIndex === -1) {
+      throw new Error("MCA not found");
+    }
+
+    // Extract the grades from the first row
+    const grades = data[1].slice(1);
+    console.log(grades);
+
+    // Find the closest lower value to averageScore
+    let closestIndex = -1;
+    let minDiff = Infinity;
+    for (let i = 1; i < data[mcaRowIndex].length; i++) {
+      const value = data[mcaRowIndex][i];
+      const diff = Math.abs(value - averageScore);
+      if (value <= averageScore && diff < minDiff) {
+        minDiff = diff;
+        closestIndex = i;
+      }
+    }
+
+    if (closestIndex === -1) {
+      throw new Error("No valid average found for the given score");
+    }
+
+    // Return the grade for the closest value
+    return grades[closestIndex - 1]; // Adjust for the grades offset
+  }
+
   const calcAndAddGrade = async (
     subjectID,
     obtainedWeightage,
     examWeightage,
-    updatedExams=[]
+    average,
+    updatedExams = []
   ) => {
     let obtainedWeightages = 0;
     let allWeightages = 0;
     let percentage = 0;
-  
+
     // Use updatedExams instead of exams to calculate grades
     for (let i = 0; i < updatedExams.length; i++) {
       const element = updatedExams[i];
       obtainedWeightages += Number(element.obtainedWeightage);
       allWeightages += Number(element.weightage);
     }
-  
+
     obtainedWeightages += Number(obtainedWeightage);
     allWeightages += Number(examWeightage);
-  
+
     if (obtainedWeightages !== 0 && allWeightages !== 0) {
       percentage = (obtainedWeightages / allWeightages) * 100;
       const subject = subjects.find((subject) => subject._id === subjectID);
-  
+
       let grade;
       if (subject.grading === "Relative") {
-        grade = "B"; // Adjust according to your relative grading logic
+        // Example usage
+        const excelFilePath = "src/lib/MCA.xlsx";
+        const MCA = 87; // Replace with actual MCA value
+        const averageScore = 73; // Replace with actual average score
+
+        try {
+          grade = getGradeForAverage(excelFilePath, MCA, averageScore);
+          console.log("Grade:", grade);
+        } catch (error) {
+          console.error(error.message);
+        }
       } else if (subject.grading === "Absolute") {
-        // Absolute grading logic
         grade = calculateAbsoluteGrade(percentage);
       }
-  
+
       // Add grade, then calculate SGPA after grade update
       addGrade(active._id, subjectID, grade).then(() => {
         calcAndAddSGPA(subjectID); // Ensure SGPA is calculated after the grade is updated
       });
     }
   };
-  
 
   // FETCH EXAMS
   const getExams = async (semesterID, subjectID) => {
@@ -235,7 +235,8 @@ const ExamState = (props) => {
         calcAndAddGrade(
           subjectID,
           ((weightage * ((obtainedMarks / totalMarks) * 100)) / 100).toFixed(3),
-          weightage
+          weightage,
+          ((weightage * ((averageMarks / totalMarks) * 100)) / 100).toFixed(3)
         );
         calcAndAddSGPA(subjectID);
       }
@@ -260,7 +261,9 @@ const ExamState = (props) => {
   };
 
   return (
-    <ExamContext.Provider value={{ exams, getExams, addExam, deleteExam,calcAndAddSGPA }}>
+    <ExamContext.Provider
+      value={{ exams, getExams, addExam, deleteExam, calcAndAddSGPA }}
+    >
       {props.children}
     </ExamContext.Provider>
   );

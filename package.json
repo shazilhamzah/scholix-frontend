@@ -21,11 +21,13 @@
     "react-router": "^6.25.1",
     "react-router-dom": "^6.25.1",
     "react-scripts": "5.0.1",
+    "read-excel-file": "^5.8.5",
     "shadcn-ui": "^0.8.0",
     "sweetalert2": "^11.12.3",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "set PORT=3006 && react-scripts start",
