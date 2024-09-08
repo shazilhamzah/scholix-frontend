@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 
 const host = process.env.REACT_APP_BACKEND_HOST;
 const XLSX = require("xlsx");
+const excelFilePath = "../../lib/MCA.xlsx";
 
 const ExamState = (props) => {
   // STATES
@@ -162,7 +163,7 @@ const ExamState = (props) => {
       let grade;
       if (subject.grading === "Relative") {
         // Example usage
-        const excelFilePath = "src/lib/MCA.xlsx";
+        
 
         try {
           grade = getGradeForAverage(excelFilePath, percentage, average);
