@@ -8,6 +8,7 @@ const host = process.env.REACT_APP_BACKEND_HOST;
 const XLSX = require("xlsx");
 const excelFilePath = `${process.env.PUBLIC_URL}/MCA.xlsx`;
 
+
 const ExamState = (props) => {
   // STATES
   const [exams, setExams] = useState([]);
@@ -90,6 +91,7 @@ const ExamState = (props) => {
 
   function getGradeForAverage(excelFilePath, MCA, averageScore) {
     // Read the Excel file
+    console.log(excelFilePath);
     const workbook = XLSX.readFile(excelFilePath);
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
