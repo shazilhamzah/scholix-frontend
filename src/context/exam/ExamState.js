@@ -1,23 +1,39 @@
-import { useState, useContext, act } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import ExamContext from "../exam/ExamContext";
 import SubjectContext from "../subject/SubjectContext";
 import SemesterContext from "../semester/SemesterContext";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 
 const host = process.env.REACT_APP_BACKEND_HOST;
-const XLSX = require("xlsx");
-const excelFilePath = `${process.env.PUBLIC_URL}/MCA.xlsx`;
-
 
 const ExamState = (props) => {
   // STATES
   const [exams, setExams] = useState([]);
+  const [fileData, setFileData] = useState([]);
 
   // CONTEXTS
   const { subjects, addGrade } = useContext(SubjectContext);
   const { active, addSGPA } = useContext(SemesterContext);
 
-  // FUNCTIONS
+  useEffect(() => {
+    // Fetch and process the Excel file
+    const fetchExcelFile = async () => {
+      try {
+        const response = await fetch(`${process.env.PUBLIC_URL}/MCA.xlsx`);
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        setFileData(data);
+      } catch (error) {
+        console.error("Error fetching and processing Excel file:", error);
+      }
+    };
+
+    fetchExcelFile();
+  }, []);
 
   const calcAndAddSGPA = async (subjectID) => {
     let index = 0;
@@ -29,49 +45,58 @@ const ExamState = (props) => {
       let credHr = element.creditHrs;
       totalCredHrs += credHr;
       if (grade) {
-        if (grade === "A+" || grade === "A") {
-          sgpa += 4.0 * credHr;
-        } else if (grade === "A-") {
-          sgpa += 3.67 * credHr;
-        } else if (grade === "B+") {
-          sgpa += 3.33 * credHr;
-        } else if (grade === "B") {
-          sgpa += 3 * credHr;
-        } else if (grade === "B-") {
-          sgpa += 2.67 * credHr;
-        } else if (grade === "C+") {
-          sgpa += 2.33 * credHr;
-        } else if (grade === "C") {
-          sgpa += 2 * credHr;
-        } else if (grade === "C-") {
-          sgpa += 1.67 * credHr;
-        } else if (grade === "D+") {
-          sgpa += 1.33 * credHr;
-        } else if (grade === "D") {
-          sgpa += 1 * credHr;
-        } else if (grade === "F") {
-          sgpa += 0.0 * credHr;
+        switch (grade) {
+          case "A+":
+          case "A":
+            sgpa += 4.0 * credHr;
+            break;
+          case "A-":
+            sgpa += 3.67 * credHr;
+            break;
+          case "B+":
+            sgpa += 3.33 * credHr;
+            break;
+          case "B":
+            sgpa += 3 * credHr;
+            break;
+          case "B-":
+            sgpa += 2.67 * credHr;
+            break;
+          case "C+":
+            sgpa += 2.33 * credHr;
+            break;
+          case "C":
+            sgpa += 2 * credHr;
+            break;
+          case "C-":
+            sgpa += 1.67 * credHr;
+            break;
+          case "D+":
+            sgpa += 1.33 * credHr;
+            break;
+          case "D":
+            sgpa += 1 * credHr;
+            break;
+          case "F":
+            sgpa += 0.0 * credHr;
+            break;
+          default:
+            break;
         }
       }
     }
     addSGPA(active._id, sgpa / totalCredHrs);
   };
+
   const alert = (a) => {
-    if (a) {
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "Exam added successfully",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Error adding exam",
-      });
-    }
+    Swal.fire({
+      position: "center",
+      icon: a ? "success" : "error",
+      title: a ? "Exam added successfully" : "Oops...",
+      text: a ? undefined : "Error adding exam",
+      showConfirmButton: !a,
+      timer: a ? 1500 : undefined,
+    });
   };
 
   const calculateAbsoluteGrade = (percentage) => {
@@ -89,18 +114,9 @@ const ExamState = (props) => {
     return "F";
   };
 
-  function getGradeForAverage(excelFilePath, MCA, averageScore) {
-    // Read the Excel file
-    console.log(excelFilePath);
-    const workbook = XLSX.readFile(excelFilePath);
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
+  const getGradeForAverage = (MCA, averageScore) => {
+    const data = fileData;
 
-    // Convert sheet to JSON
-    const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    // Find the row with the given MCA value
-    const headers = data[0];
     let mcaRowIndex = -1;
     for (let i = 2; i < data.length; i++) {
       if (data[i][0] === MCA) {
@@ -113,11 +129,7 @@ const ExamState = (props) => {
       throw new Error("MCA not found");
     }
 
-    // Extract the grades from the first row
     const grades = data[1].slice(1);
-    console.log(grades);
-
-    // Find the closest lower value to averageScore
     let closestIndex = -1;
     let minDiff = Infinity;
     for (let i = 1; i < data[mcaRowIndex].length; i++) {
@@ -133,9 +145,8 @@ const ExamState = (props) => {
       throw new Error("No valid average found for the given score");
     }
 
-    // Return the grade for the closest value
-    return grades[closestIndex - 1]; // Adjust for the grades offset
-  }
+    return grades[closestIndex - 1];
+  };
 
   const calcAndAddGrade = async (
     subjectID,
@@ -148,7 +159,6 @@ const ExamState = (props) => {
     let allWeightages = 0;
     let percentage = 0;
 
-    // Use updatedExams instead of exams to calculate grades
     for (let i = 0; i < updatedExams.length; i++) {
       const element = updatedExams[i];
       obtainedWeightages += Number(element.obtainedWeightage);
@@ -164,11 +174,8 @@ const ExamState = (props) => {
 
       let grade;
       if (subject.grading === "Relative") {
-        // Example usage
-
         try {
-          grade = getGradeForAverage(excelFilePath, percentage, average);
-          console.log("Grade:", grade);
+          grade = getGradeForAverage(subject.grading.MCA, percentage);
         } catch (error) {
           console.error(error.message);
         }
@@ -176,20 +183,17 @@ const ExamState = (props) => {
         grade = calculateAbsoluteGrade(percentage);
       }
 
-      // Add grade, then calculate SGPA after grade update
       if (grade) {
-        console.log(grade);
         addGrade(active._id, subjectID, grade).then(() => {
-          calcAndAddSGPA(subjectID); // Ensure SGPA is calculated after the grade is updated
+          calcAndAddSGPA(subjectID);
         });
       }
     }
   };
 
-  // FETCH EXAMS
   const getExams = async (semesterID, subjectID) => {
     try {
-      const respose = await fetch(`${host}/api/exam/fetchexams`, {
+      const response = await fetch(`${host}/api/exam/fetchexams`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -198,14 +202,13 @@ const ExamState = (props) => {
           subjectID: subjectID,
         },
       });
-      const a = await respose.json();
-      setExams(a);
+      const data = await response.json();
+      setExams(data);
     } catch (error) {
       console.error("Error fetching exams:", error);
     }
   };
 
-  // ADD EXAM
   const addExam = async (
     semesterID,
     subjectID,
@@ -232,9 +235,9 @@ const ExamState = (props) => {
           weightage,
         }),
       });
-      const a = await response.json();
-      setExams([...exams, a]);
-      if (a.success === true) {
+      const data = await response.json();
+      setExams([...exams, data]);
+      if (data.success === true) {
         calcAndAddGrade(
           subjectID,
           ((weightage * ((obtainedMarks / totalMarks) * 100)) / 100).toFixed(3),
@@ -243,24 +246,28 @@ const ExamState = (props) => {
         );
         calcAndAddSGPA(subjectID);
       }
-      alert(a.success);
+      alert(data.success);
     } catch (error) {
       console.error("Error adding exams:", error);
     }
   };
 
   const deleteExam = async (subjectID, examID) => {
-    const response = await fetch(`${host}/api/exam/deleteexam/${examID}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "auth-token": localStorage.getItem("token"),
-        semesterID: active._id,
-        subjectID: subjectID,
-      },
-    });
-    const newExams = exams.filter((exam) => exam._id !== examID);
-    setExams(newExams);
+    try {
+      await fetch(`${host}/api/exam/deleteexam/${examID}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem("token"),
+          semesterID: active._id,
+          subjectID: subjectID,
+        },
+      });
+      const newExams = exams.filter((exam) => exam._id !== examID);
+      setExams(newExams);
+    } catch (error) {
+      console.error("Error deleting exam:", error);
+    }
   };
 
   return (
