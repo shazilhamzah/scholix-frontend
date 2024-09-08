@@ -124,10 +124,10 @@ const ExamState = (props) => {
     let mcaRowIndex = -1;
     
     // Loop through the data to find the MCA
-    for (let i = 2; i < data.length; i++) {
+    for (let i = 1; i < data.length; i++) {
       // Normalizing MCA values to ensure case and space do not affect matching
       const mcaValue = data[i][0] ? data[i][0].toString().trim().toLowerCase() : null;
-      if (mcaValue === MCA.trim().toLowerCase()) {
+      if (mcaValue === MCA) {
         mcaRowIndex = i;
         break;
       }
@@ -188,7 +188,7 @@ const ExamState = (props) => {
       let grade;
       if (subject.grading === "Relative") {
         try {
-          grade = getGradeForAverage(subject.grading.MCA, percentage);
+          grade = getGradeForAverage(average, percentage);
         } catch (error) {
           console.error(error.message);
         }
