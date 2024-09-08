@@ -6,9 +6,9 @@ import Swal from "sweetalert2";
 
 const host = process.env.REACT_APP_BACKEND_HOST;
 const XLSX = require("xlsx");
-const excelFilePath = "../../lib/MCA.xlsx";
+const excelFilePath = "/MCA.xlsx";
 
-const ExamState = (props) => {
+  const ExamState = (props) => {
   // STATES
   const [exams, setExams] = useState([]);
 
