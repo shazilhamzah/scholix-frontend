@@ -126,8 +126,8 @@ const ExamState = (props) => {
     // Loop through the data to find the MCA
     for (let i = 1; i < data.length; i++) {
       // Normalizing MCA values to ensure case and space do not affect matching
-      const mcaValue = data[i][0] ? data[i][0].toString().trim().toLowerCase() : null;
-      if (mcaValue === MCA) {
+      const mcaValue = Math.ceil(Number(data[i][0])) ? Math.ceil(Number(data[i][0])) : null;
+      if (mcaValue === Math.ceil(Number(MCA))) {
         mcaRowIndex = i;
         break;
       }
