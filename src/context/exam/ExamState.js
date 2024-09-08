@@ -6,9 +6,9 @@ import Swal from "sweetalert2";
 
 const host = process.env.REACT_APP_BACKEND_HOST;
 const XLSX = require("xlsx");
-const excelFilePath = "/MCA.xlsx";
+const excelFilePath = await fetch("/MCA.xlsx");
 
-  const ExamState = (props) => {
+const ExamState = (props) => {
   // STATES
   const [exams, setExams] = useState([]);
 
@@ -163,7 +163,6 @@ const excelFilePath = "/MCA.xlsx";
       let grade;
       if (subject.grading === "Relative") {
         // Example usage
-        
 
         try {
           grade = getGradeForAverage(excelFilePath, percentage, average);
@@ -176,9 +175,12 @@ const excelFilePath = "/MCA.xlsx";
       }
 
       // Add grade, then calculate SGPA after grade update
-      addGrade(active._id, subjectID, grade).then(() => {
-        calcAndAddSGPA(subjectID); // Ensure SGPA is calculated after the grade is updated
-      });
+      if (grade) {
+        console.log(grade);
+        addGrade(active._id, subjectID, grade).then(() => {
+          calcAndAddSGPA(subjectID); // Ensure SGPA is calculated after the grade is updated
+        });
+      }
     }
   };
 
