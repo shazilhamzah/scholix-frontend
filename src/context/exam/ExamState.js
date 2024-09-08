@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 
 const host = process.env.REACT_APP_BACKEND_HOST;
 const XLSX = require("xlsx");
-const excelFilePath = await fetch("/MCA.xlsx");
+const excelFilePath = `${process.env.PUBLIC_URL}/MCA.xlsx`;
 
 const ExamState = (props) => {
   // STATES
