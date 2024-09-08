@@ -161,34 +161,75 @@ const ExamState = (props) => {
     return grades[closestIndex - 1]; // Return the matching grade
   };
 
+  // const calcAndAddGrade = async (
+  //   subjectID,
+  //   obtainedWeightage,
+  //   examWeightage,
+  //   average,
+  //   updatedExams = []
+  // ) => {
+  //   let obtainedWeightages = 0;
+  //   let allWeightages = 0;
+  //   let percentage = 0;
+
+  //   for (let i = 0; i < updatedExams.length; i++) {
+  //     const element = updatedExams[i];
+  //     obtainedWeightages += Number(element.obtainedWeightage);
+  //     allWeightages += Number(element.weightage);
+  //   }
+
+  //   obtainedWeightages += Number(obtainedWeightage);
+  //   allWeightages += Number(examWeightage);
+
+  //   if (obtainedWeightages !== 0 && allWeightages !== 0) {
+  //     percentage = (obtainedWeightages / allWeightages) * 100;
+  //     const subject = subjects.find((subject) => subject._id === subjectID);
+
+  //     let grade;
+  //     if (subject.grading === "Relative") {
+  //       try {
+  //         console.log("average",average);
+  //         grade = getGradeForAverage(average, percentage);
+  //       } catch (error) {
+  //         console.error(error.message);
+  //       }
+  //     } else if (subject.grading === "Absolute") {
+  //       grade = calculateAbsoluteGrade(percentage);
+  //     }
+
+  //     if (grade) {
+  //       addGrade(active._id, subjectID, grade).then(() => {
+  //         calcAndAddSGPA(subjectID);
+  //       });
+  //     }
+  //   }
+  // };
   const calcAndAddGrade = async (
     subjectID,
     obtainedWeightage,
     examWeightage,
     average,
-    updatedExams = []
+    updatedExams = [] // This now includes all exams, not just the new one
   ) => {
     let obtainedWeightages = 0;
     let allWeightages = 0;
     let percentage = 0;
-
+  
+    // Loop through all exams to accumulate weightages
     for (let i = 0; i < updatedExams.length; i++) {
       const element = updatedExams[i];
       obtainedWeightages += Number(element.obtainedWeightage);
       allWeightages += Number(element.weightage);
     }
-
-    obtainedWeightages += Number(obtainedWeightage);
-    allWeightages += Number(examWeightage);
-
+  
+    // Now, calculate the percentage based on total weightages
     if (obtainedWeightages !== 0 && allWeightages !== 0) {
       percentage = (obtainedWeightages / allWeightages) * 100;
       const subject = subjects.find((subject) => subject._id === subjectID);
-
+  
       let grade;
       if (subject.grading === "Relative") {
         try {
-          console.log("average",average);
           grade = getGradeForAverage(average, percentage);
         } catch (error) {
           console.error(error.message);
@@ -196,7 +237,8 @@ const ExamState = (props) => {
       } else if (subject.grading === "Absolute") {
         grade = calculateAbsoluteGrade(percentage);
       }
-
+  
+      // If a valid grade is found, update it for the subject
       if (grade) {
         addGrade(active._id, subjectID, grade).then(() => {
           calcAndAddSGPA(subjectID);
@@ -223,6 +265,49 @@ const ExamState = (props) => {
     }
   };
 
+  // const addExam = async (
+  //   semesterID,
+  //   subjectID,
+  //   examType,
+  //   totalMarks,
+  //   obtainedMarks,
+  //   averageMarks,
+  //   weightage
+  // ) => {
+  //   try {
+  //     const response = await fetch(`${host}/api/exam/newexam`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "auth-token": localStorage.getItem("token"),
+  //         semesterID: semesterID,
+  //         subjectID: subjectID,
+  //       },
+  //       body: JSON.stringify({
+  //         examType,
+  //         totalMarks,
+  //         obtainedMarks,
+  //         averageMarks,
+  //         weightage,
+  //       }),
+  //     });
+  //     const data = await response.json();
+  //     setExams([...exams, data]);
+  //     if (data.success === true) {
+  //       calcAndAddGrade(
+  //         subjectID,
+  //         ((weightage * ((obtainedMarks / totalMarks) * 100)) / 100).toFixed(3),
+  //         weightage,
+  //         Math.ceil(Number(((weightage * ((averageMarks / totalMarks) * 100)) / 100)))
+  //       );
+  //       console.log(weightage,averageMarks,totalMarks);
+  //       calcAndAddSGPA(subjectID);
+  //     }
+  //     alert(data.success);
+  //   } catch (error) {
+  //     console.error("Error adding exams:", error);
+  //   }
+  // };
   const addExam = async (
     semesterID,
     subjectID,
@@ -233,6 +318,7 @@ const ExamState = (props) => {
     weightage
   ) => {
     try {
+      // Adding the new exam
       const response = await fetch(`${host}/api/exam/newexam`, {
         method: "POST",
         headers: {
@@ -249,23 +335,30 @@ const ExamState = (props) => {
           weightage,
         }),
       });
+  
       const data = await response.json();
-      setExams([...exams, data]);
+      
       if (data.success === true) {
+        // Fetch all exams again after adding the new one
+        const updatedExams = await getExams(semesterID, subjectID);
+  
+        // Calculate and add the grade, taking into account all previous exams
         calcAndAddGrade(
           subjectID,
           ((weightage * ((obtainedMarks / totalMarks) * 100)) / 100).toFixed(3),
           weightage,
-          ((weightage * ((averageMarks / totalMarks) * 100)) / 100).toFixed(3)
+          Math.ceil(Number(((weightage * ((averageMarks / totalMarks) * 100)) / 100))),
+          updatedExams // Pass all exams including the new one
         );
+  
+        // Recalculate SGPA based on all exams
         calcAndAddSGPA(subjectID);
       }
       alert(data.success);
     } catch (error) {
-      console.error("Error adding exams:", error);
+      console.error("Error adding exam:", error);
     }
   };
-
   const deleteExam = async (subjectID, examID) => {
     try {
       await fetch(`${host}/api/exam/deleteexam/${examID}`, {
