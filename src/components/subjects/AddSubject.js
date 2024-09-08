@@ -58,6 +58,7 @@ export const AddSubject = () => {
   const gradingTypeInputFunction = (s) => () => {
     if (s === "Relative" || s === "Absolute") {
       setGradingTypeInput(s);
+      console.log(s);
       setDropdownOpen(false);
     }
   };

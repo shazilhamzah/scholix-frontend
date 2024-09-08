@@ -163,11 +163,9 @@ const ExamState = (props) => {
       if (subject.grading === "Relative") {
         // Example usage
         const excelFilePath = "src/lib/MCA.xlsx";
-        const MCA = 87; // Replace with actual MCA value
-        const averageScore = 73; // Replace with actual average score
 
         try {
-          grade = getGradeForAverage(excelFilePath, MCA, averageScore);
+          grade = getGradeForAverage(excelFilePath, percentage, average);
           console.log("Grade:", grade);
         } catch (error) {
           console.error(error.message);
