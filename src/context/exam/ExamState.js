@@ -116,22 +116,34 @@ const ExamState = (props) => {
 
   const getGradeForAverage = (MCA, averageScore) => {
     const data = fileData;
-
+  
+    // Log MCA and data to troubleshoot
+    console.log("MCA:", MCA);
+    console.log("Excel Data:", data);
+  
     let mcaRowIndex = -1;
+    
+    // Loop through the data to find the MCA
     for (let i = 2; i < data.length; i++) {
-      if (data[i][0] === MCA) {
+      // Normalizing MCA values to ensure case and space do not affect matching
+      const mcaValue = data[i][0] ? data[i][0].toString().trim().toLowerCase() : null;
+      if (mcaValue === MCA.trim().toLowerCase()) {
         mcaRowIndex = i;
         break;
       }
     }
-
+  
+    // Handle the case where MCA is not found
     if (mcaRowIndex === -1) {
-      throw new Error("MCA not found");
+      console.error(`MCA '${MCA}' not found in the Excel sheet.`);
+      return "MCA not found";
     }
-
-    const grades = data[1].slice(1);
+  
+    const grades = data[1].slice(1); // Assuming second row contains grade categories
     let closestIndex = -1;
     let minDiff = Infinity;
+  
+    // Find the closest average score
     for (let i = 1; i < data[mcaRowIndex].length; i++) {
       const value = data[mcaRowIndex][i];
       const diff = Math.abs(value - averageScore);
@@ -140,12 +152,13 @@ const ExamState = (props) => {
         closestIndex = i;
       }
     }
-
+  
     if (closestIndex === -1) {
-      throw new Error("No valid average found for the given score");
+      console.error("No valid average found for the given score.");
+      return "No valid average found";
     }
-
-    return grades[closestIndex - 1];
+  
+    return grades[closestIndex - 1]; // Return the matching grade
   };
 
   const calcAndAddGrade = async (
