@@ -94,9 +94,6 @@ export const AddSubject = () => {
         >
           Add Subject
         </h1>
-        <div class="alert alert-warning" role="alert">
-          Relative grading scheme is currently unimplemented! It will be added in future updates.
-        </div>
         <form className="mx-auto max-w-sm align-center mt-5">
           <div className="mb-3">
             <div className="flex gap-2">
